@@ -13,7 +13,9 @@ select
   date,
   departure_time,
   stop_name,
-  trip_headsign
+  trip_headsign,
+  t.trip_id,
+  stop_sequence
 from gvb_ferries as f
 inner join trips as t on f.route_id=t.route_id
 inner join calendar_dates as cd on cd.service_id=t.service_id
