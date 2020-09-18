@@ -1,3 +1,3 @@
 select * from pontjes
-where route_long_name like '%NDSM - Centraal%'
-  and date='20200916';
+where date='20200917'
+  and route_long_name like '%pontsteiger%';

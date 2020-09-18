@@ -1,0 +1,9 @@
+[global.databases]
+pontjes_db = { url = "./db" }
+
+[global]
+address = "0.0.0.0"
+port = 8080
+
+[production]
+template_dir = "/templates"

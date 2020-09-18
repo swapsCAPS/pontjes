@@ -13,6 +13,7 @@ select
   date,
   departure_time,
   stop_name,
+  s.stop_id,
   trip_headsign,
   t.trip_id,
   stop_sequence
@@ -22,3 +23,10 @@ inner join calendar_dates as cd on cd.service_id=t.service_id
 inner join stop_times as st on st.trip_id=t.trip_id
 inner join stops as s on s.stop_id=st.stop_id
 order by route_long_name, date, departure_time;
+
+drop table pont_stops;
+create table pont_stops as
+select s.stop_name, s.stop_id, stop_code, stop_lat, stop_lon, platform_code
+from pontjes as p
+inner join stops as s on s.stop_id=p.stop_id
+group by p.stop_id;
