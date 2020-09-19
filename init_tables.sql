@@ -4,12 +4,15 @@ select * from routes where agency_id='GVB';
 
 drop table gvb_ferries;
 create table gvb_ferries as
-select * from gvb_routes where route_url like '%veerboot%';
+select * from gvb_routes
+where route_url like '%veerboot%';
 
-drop table pontjes;
-create table pontjes as
+drop table pont_trips;
+create table pont_trips as
 select
+  f.route_id,
   route_long_name,
+  route_short_name,
   date,
   departure_time,
   stop_name,
@@ -26,7 +29,16 @@ order by route_long_name, date, departure_time;
 
 drop table pont_stops;
 create table pont_stops as
-select s.stop_name, s.stop_id, stop_code, stop_lat, stop_lon, platform_code
-from pontjes as p
+select
+  s.stop_name,
+  s.stop_id,
+  stop_code,
+  stop_lat,
+  stop_lon,
+  platform_code,
+  group_concat(distinct trip_headsign)
+from pont_trips as p
 inner join stops as s on s.stop_id=p.stop_id
+where s.stop_name like '%amsterdam%'
 group by p.stop_id;
+

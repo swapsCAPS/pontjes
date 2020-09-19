@@ -17,6 +17,10 @@ h2 {
   font-size: 24pt;
 }
 
+a {
+  color: #ccc;
+}
+
 .container {
   display: flex;
   align-items: center;
@@ -33,10 +37,15 @@ h2 {
 
 .main {
   margin: auto;
+  padding: 0 16px;
   max-width: 700px;
+  max-height: 900px;
+  overflow-y: scroll;
 }
 
 .sub-text {
+  margin: auto;
+  max-width: 700px;
   position: absolute;
   padding: inherit;
   right: 0;

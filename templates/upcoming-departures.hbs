@@ -11,8 +11,15 @@
   <div class="container">
     <div class="main">
       <ul class="stop_list">
-        {{ #each stops }}
-        <li><a href="/upcoming-departures/{{stop_id}}">{{ stop_name }}</a></li>
+        {{ #each trips }}
+        <li>
+          <span>{{ departure_time }}</span>
+          <span> </span>
+          <span>{{ stop_name }}</span>
+          <span> </span>
+          <span>{{ trip_headsign }}</span>
+          <span> </span>
+        </li>
         {{ /each }}
       </ul>
     </div>
