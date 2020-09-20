@@ -15,15 +15,33 @@ use std::collections::HashMap;
 
 mod schema {
     table! {
-        pont_routes (route_id) {
-            route_id -> Text,
-            route_long_name -> Text,
+        gvb_stops (stop_id) {
+            stop_id -> Text,
+            stop_code -> Text,
+            stop_name -> Text,
+            stop_lat -> Text,
+            stop_lon -> Text,
+            location_type -> Text,
+            parent_station -> Text,
+            stop_timezone -> Text,
+            wheelchair_boarding -> Text,
+            platform_code -> Text,
+            zone_id -> Text,
         }
     }
     table! {
-        pont_stops (stop_id) {
+        gvb_stop_times (stop_id) {
+            trip_id -> Text,
+            stop_sequence -> Text,
             stop_id -> Text,
-            stop_name -> Text,
+            stop_headsign -> Text,
+            arrival_time -> Text,
+            departure_time -> Text,
+            pickup_type -> Text,
+            drop_off_type -> Text,
+            timepoint -> Text,
+            shape_dist_traveled -> Text,
+            fare_units_traveled -> Text,
         }
     }
     table! {
@@ -40,9 +58,11 @@ mod schema {
     }
 }
 
-use self::schema::pont_routes::dsl::*;
-use self::schema::pont_stops::dsl::*;
-use self::schema::pont_trips::dsl::{stop_id as pt_stop_id, *};
+allow_tables_to_appear_in_same_query!(pont_trips, gvb_stop_times); // sErioUsLy?!
+
+use self::schema::gvb_stop_times;
+use self::schema::gvb_stops;
+use self::schema::pont_trips;
 
 #[derive(serde::Serialize, Queryable, Debug)]
 pub struct Route {
@@ -53,7 +73,16 @@ pub struct Route {
 #[derive(serde::Serialize, Queryable, Debug)]
 pub struct Stop {
     pub stop_id: String,
+    pub stop_code: String,
     pub stop_name: String,
+    pub stop_lat: String,
+    pub stop_lon: String,
+    pub location_type: String,
+    pub parent_station: String,
+    pub stop_timezone: String,
+    pub wheelchair_boarding: String,
+    pub platform_code: String,
+    pub zone_id: String,
 }
 
 #[derive(serde::Serialize, Queryable, Debug)]
@@ -73,7 +102,7 @@ struct PontjesDb(SqliteConnection);
 
 #[get("/")]
 fn index(conn: PontjesDb) -> Template {
-    match pont_stops.load::<Stop>(&*conn) {
+    match gvb_stops::table.load::<Stop>(&*conn) {
         Ok(results) => {
             let mut context = HashMap::new();
             context.insert("stops", results);
@@ -94,14 +123,18 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     println!("today {}", today);
     let time = now.format("%H:%M").to_string();
     println!("time {}", time);
-    let query = date
+    let trip_ids = gvb_stop_times::table
+        .select(gvb_stop_times::dsl::trip_id)
+        .filter(gvb_stop_times::dsl::stop_id.eq(sid.as_str()));
+    let query = pont_trips::dsl::date
         .eq(today)
-        .and(pt_stop_id.eq(sid.as_str()))
-        .and(departure_time.gt(time))
-        .and(stop_sequence.eq("1"));
-    match pont_trips
+        .and(pont_trips::dsl::departure_time.gt(time))
+        .and(pont_trips::dsl::trip_id.eq_any(trip_ids));
+    let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query).to_string();
+    println!("{:?}", sql);
+    match pont_trips::table
         .filter(query)
-        .order(departure_time)
+        .order(pont_trips::dsl::departure_time)
         .load::<Row>(&*conn)
     {
         Ok(results) => {
