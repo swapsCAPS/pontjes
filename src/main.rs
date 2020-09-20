@@ -57,7 +57,7 @@ pub struct Stop {
 }
 
 #[derive(serde::Serialize, Queryable, Debug)]
-pub struct Trip {
+pub struct Row {
     pub route_long_name: String,
     pub date: String,
     pub departure_time: String,
@@ -102,7 +102,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     match pont_trips
         .filter(query)
         .order(departure_time)
-        .load::<Trip>(&*conn)
+        .load::<Row>(&*conn)
     {
         Ok(results) => {
             println!("results {:?}", results);
