@@ -10,18 +10,17 @@
 <body>
   <div class="container">
     <div class="main">
-      <ul class="stop_list">
-        {{ #each trips }}
-        <li>
-          <span>{{ departure_time }}</span>
-          <span> </span>
-          <span>{{ stop_name }}</span>
-          <span> </span>
-          <span>{{ trip_headsign }}</span>
-          <span> </span>
-        </li>
+        <table>
+          {{ #each trips }}
+          <tr>
+            <td>{{ trip_id }}</td>
+            <td>{{ stop_sequence }}</td>
+            <td>{{ route_long_name }}</td>
+            <td>{{ departure_time }}</td>
+            <td>{{ stop_name }}</td>
+          </tr>
         {{ /each }}
-      </ul>
+      </table>
     </div>
     <h2 class="sub-text">- Daan 2020</h2>
   </div>

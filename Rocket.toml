@@ -3,7 +3,7 @@ pontjes_db = { url = "./db" }
 
 [global]
 address = "0.0.0.0"
-port = 8080
+port = 4242
 
 [production]
 template_dir = "/templates"

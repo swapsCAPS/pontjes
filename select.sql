@@ -9,7 +9,7 @@ select
 from pont_trips
 where
   (
-    (date=20200920 and departure_time>"20:50") or date=20200921
+    (date=20200920 and departure_time>"23:50") or date=20200921
   ) and trip_id in (
       select trip_id
       from gvb_stop_times as s
