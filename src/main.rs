@@ -59,6 +59,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         .and(pont_trips::dsl::trip_id.eq_any(trip_ids));
     let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query).to_string();
     println!("{:?}", sql);
+
     match pont_trips::table
         .filter(query)
         .order(pont_trips::dsl::date)
@@ -66,17 +67,33 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         .load::<models::Row>(&*conn)
     {
         Ok(results) => {
-            let mut context: HashMap<String, Vec<models::Row>> = HashMap::new();
-            for row in results {
-                if !context.contains_key(&row.trip_id) {
-                    context.insert(row.trip_id.clone(), Vec::new());
+            let tuples: Vec<(String, models::Row)> = results
+                .into_iter()
+                .map(|r| (format!("{}{}", r.date, r.trip_id), r))
+                .collect_vec();
+
+            let group_map = tuples.into_iter().into_group_map();
+
+            let mut data: Vec<&Vec<models::Row>> = group_map
+                .values()
+                .filter(|row| row[row.len() - 1].stop_id != sid.as_str())
+                .sorted_by(|a, b| {
+                    let a_stop_id = pontjes::get_requested_stop(a, sid.as_str());
+                    let b_stop_id = pontjes::get_requested_stop(b, sid.as_str());
+
+                    Ord::cmp(&a_stop_id, &b_stop_id)
+                })
+                .collect();
+
+            data.truncate(50);
+
+            for d in &data {
+                for i in d.into_iter() {
+                    println!("i {:?}", &i);
                 }
-                if let Some(d) = context.get_mut(&row.trip_id) {
-                    d.push(row);
-                }
+                println!("---")
             }
-            println!("{:?}", &context);
-            Template::render("upcoming-departures", &context)
+            Template::render("upcoming-departures", &data)
         }
         Err(e) => {
             println!("Error! {}", e);

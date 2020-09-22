@@ -11,13 +11,11 @@
   <div class="container">
     <div class="main">
         <table>
-          {{ #each trips }}
+          {{ #each this }}
           <tr>
-            <td>{{ trip_id }}</td>
-            <td>{{ stop_sequence }}</td>
-            <td>{{ route_long_name }}</td>
-            <td>{{ departure_time }}</td>
-            <td>{{ stop_name }}</td>
+            {{ #each this }}
+              <td>{{ departure_time }} - {{ stop_name }}</td>
+            {{ /each }}
           </tr>
         {{ /each }}
       </table>
