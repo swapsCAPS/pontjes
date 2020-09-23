@@ -3,6 +3,9 @@ create table gvb_ferries as
 select * from routes
 where route_url like '%veerboot%' and agency_id='GVB';
 
+update stops      set stop_name      = replace(stop_name,      'Amsterdam, ', '');
+update stop_times set departure_time = substr(departure_time, 1, 5);
+
 drop table pont_trips;
 create table pont_trips as
 select
