@@ -5,7 +5,7 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 
-use chrono::{prelude::*, DateTime, Local};
+use chrono::Local;
 use diesel::{prelude::*, SqliteConnection};
 use itertools::Itertools;
 use rocket::http::RawStr;
@@ -45,10 +45,6 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         .to_string();
     let time = now.format("%H:%M").to_string();
 
-    println!("now      {}", now);
-    println!("today    {}", today);
-    println!("tomorrow {}", tomorrow);
-    println!("time     {}", time);
     let trip_ids = gvb_stop_times::table
         .select(gvb_stop_times::dsl::trip_id)
         .filter(gvb_stop_times::dsl::stop_id.eq(sid.as_str()));
@@ -57,8 +53,6 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         .and(pont_trips::dsl::departure_time.gt(time))
         .or(pont_trips::dsl::date.eq(tomorrow))
         .and(pont_trips::dsl::trip_id.eq_any(trip_ids));
-    let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query).to_string();
-    println!("{:?}", sql);
 
     match pont_trips::table
         .filter(query)
@@ -85,14 +79,8 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                 })
                 .collect();
 
-            data.truncate(50);
+            data.truncate(30);
 
-            for d in &data {
-                for i in d.into_iter() {
-                    println!("i {:?}", &i);
-                }
-                println!("---")
-            }
             Template::render("upcoming-departures", &data)
         }
         Err(e) => {
