@@ -9,18 +9,21 @@
 </head>
 <body>
   <div class="container">
-    <div class="main">
-        <table>
-          {{ #each this }}
-          <tr>
-            {{ #each this }}
-              <td>{{ departure_time }} - {{ stop_name }}</td>
-            {{ /each }}
-          </tr>
+    <div class="content">
+      {{ #each this }}
+      <div class="list-item">
+        {{ #each this }}
+        <div class="list-item-node">
+          <h4>{{ stop_name }}</h1>
+          <h2>{{ departure_time }}</h2>
+        </div>
         {{ /each }}
-      </table>
+      </div>
+      {{ /each }}
     </div>
-    <h2 class="sub-text">- Daan 2020</h2>
+      <div class="footer">
+        <h2 class="sub-text">- Daan 2020</h2>
+      </div>
   </div>
 </body>
 </html>

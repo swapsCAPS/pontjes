@@ -1,3 +1,25 @@
+ @font-face {
+  font-family: Montserrat;
+  src: url(/public/fonts/Montserrat-Regular.ttf);
+}
+
+ @font-face {
+  font-family: Montserrat;
+  src: url(/public/fonts/Montserrat-Bold.ttf);
+  font-weight: bold;
+}
+
+ @font-face {
+  font-family: Roboto;
+  src: url(/public/fonts/Roboto-Regular.ttf);
+}
+
+ @font-face {
+  font-family: Roboto;
+  src: url(/public/fonts/Roboto-Bold.ttf);
+  font-weight: bold;
+}
+
 html, body, h1, h2, h3, h4, h5 {
   margin: 0;
   padding: 0;
@@ -7,6 +29,7 @@ body {
   background: #333;
   color: #ccc;
   font-weight: 400;
+  font-family: Roboto;
 }
 
 h1 {
@@ -18,38 +41,56 @@ h2 {
 }
 
 a {
-  color: #ccc;
+  text-decoration:none;
 }
 
 .container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  display: flex;
+}
+
+.footer .sub-text {
+  margin-left: auto;
+}
+
+.list-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #ccc;
+  color: #333;
+  margin: 6px 0;
+  position: relative;
+}
+
+.list-item.stop {
   justify-content: center;
+}
+
+.list-item-node {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 64px;
+  min-width: 142px;
+}
+
+.list-item a {
   position: absolute;
-  margin: auto;
-  left: 0;
-  right: 0;
+  display: block;
   top: 0;
+  left: 0;
   bottom: 0;
-  padding: 16px;
-  /* max-width: 900px; */
-}
-
-.main {
-  margin: auto;
-  padding: 0 16px;
-  /* max-width: 800px; */
-  max-height: 900px;
-  overflow-y: scroll;
-}
-
-.sub-text {
-  margin: auto;
-  max-width: 700px;
-  position: absolute;
-  padding: inherit;
   right: 0;
-  bottom: 0;
-  line-height: .8;
 }
 

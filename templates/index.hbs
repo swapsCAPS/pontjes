@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="/public/favicon.ico">
-  <link rel="stylesheet" href="/public/stylesheets/main.css">
-  <title>Heen en Weer</title>
-</head>
-<body>
-  <div class="container">
-    <div class="main">
-      <ul class="stop_list">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/public/favicon.ico">
+    <link rel="stylesheet" href="/public/stylesheets/main.css">
+    <title>Heen en Weer</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
         {{ #each stops }}
-        <li><a href="/upcoming-departures/{{stop_id}}">{{ stop_name }}</a></li>
+        <div class="list-item stop">
+            <div class="list-item-node">
+              <h4>{{ stop_name }}</h4>
+            </div>
+            <a href="/upcoming-departures/{{stop_id}}"></a>
+        </div>
         {{ /each }}
-      </ul>
+      </div>
+      <div class="footer">
+        <h2 class="sub-text">- Daan 2020</h2>
+      </div>
     </div>
-    <h2 class="sub-text">- Daan 2020</h2>
-  </div>
-</body>
+  </body>
 </html>
 
