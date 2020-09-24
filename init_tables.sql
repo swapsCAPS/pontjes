@@ -3,10 +3,10 @@ create table gvb_ferries as
 select * from routes
 where route_url like '%veerboot%' and agency_id='GVB';
 
-update stops      set stop_name      = replace(stop_name,      'Amsterdam, ', '');
-update stops      set stop_name      = replace(stop_name,      'Velsen, ', '');
-update stops      set stop_name      = replace(stop_name,      'Spaarndam, ', '');
-update stops      set stop_name      = replace(stop_name,      'Assendelft, ', '');
+update stops set stop_name = replace(stop_name, 'Amsterdam, ', '');
+update stops set stop_name = replace(stop_name, 'Velsen, ', '');
+update stops set stop_name = replace(stop_name, 'Spaarndam, ', '');
+update stops set stop_name = replace(stop_name, 'Assendelft, ', '');
 
 update stop_times set departure_time = substr(departure_time, 1, 5);
 
@@ -35,7 +35,17 @@ create table gvb_stop_times as
 select * from stop_times as st
 where st.trip_id in (select trip_id from pont_trips);
 
-drop table gvb_stops;
-create table gvb_stops as
+drop table gvb_stops_temp;
+create table gvb_stops_temp as
 select * from stops as st
 where st.stop_id in (select stop_id from gvb_stop_times);
+
+update gvb_stop_times set stop_id = '00001' where stop_id in (
+  select stop_id from gvb_stops_temp where stop_name like '%Centraal%'
+);
+update gvb_stops_temp  set stop_id = '00001' where stop_name like '%Centraal%';
+update pont_trips set stop_id = '00001' where stop_name like '%Centraal%';
+
+drop table gvb_stops;
+create table gvb_stops as
+select * from gvb_stops_temp group by stop_id;
