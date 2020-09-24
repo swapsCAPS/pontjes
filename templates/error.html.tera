@@ -1,0 +1,7 @@
+{% extends "main" %}
+
+{% block content %}
+  <div class="content oops">
+    <h1>Oeps...</h1>
+  </div>
+{% endblock content %}

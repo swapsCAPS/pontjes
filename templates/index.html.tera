@@ -1,0 +1,14 @@
+{% extends "main" %}
+
+{% block content %}
+<div class="content row wrap">
+  {% for s in stops %}
+  <div class="list-item wrap-item stop">
+      <div class="list-item-node">
+        <h4>{{ s.stop_name }}</h4>
+      </div>
+      <a href="/upcoming-departures/{{s.stop_id}}"></a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

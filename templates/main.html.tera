@@ -10,20 +10,10 @@
   <body>
     <div class="container">
       <div class="header"></div>
-      <div class="content row wrap">
-        {{ #each stops }}
-        <div class="list-item wrap-item stop">
-            <div class="list-item-node">
-              <h4>{{ stop_name }}</h4>
-            </div>
-            <a href="/upcoming-departures/{{stop_id}}"></a>
-        </div>
-        {{ /each }}
-      </div>
+      {% block content %}{% endblock content %}
       <div class="footer">
         <h2 class="sub-text">- Daan 2020</h2>
       </div>
     </div>
   </body>
 </html>
-

@@ -84,7 +84,9 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             data.truncate(10);
 
-            Template::render("upcoming-departures", &data)
+            let mut context = HashMap::new();
+            context.insert("departures", data);
+            Template::render("upcoming-departures", &context)
         }
         Err(e) => {
             println!("Error! {}", e);
