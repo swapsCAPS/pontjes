@@ -84,7 +84,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                 })
                 .collect();
 
-            data.truncate(20);
+            data.truncate(32);
 
             let mut context = HashMap::new();
             context.insert("departures", data);

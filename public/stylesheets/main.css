@@ -1,20 +1,20 @@
- @font-face {
+@font-face {
   font-family: Montserrat;
   src: url(/public/fonts/Montserrat-Regular.ttf);
 }
 
- @font-face {
+@font-face {
   font-family: Montserrat;
   src: url(/public/fonts/Montserrat-Bold.ttf);
   font-weight: bold;
 }
 
- @font-face {
+@font-face {
   font-family: Roboto;
   src: url(/public/fonts/Roboto-Regular.ttf);
 }
 
- @font-face {
+@font-face {
   font-family: Roboto;
   src: url(/public/fonts/Roboto-Bold.ttf);
   font-weight: bold;
@@ -29,7 +29,7 @@ body {
   background: #c7e0f2;
   color: #fafafa;
   font-weight: 400;
-  font-family: Roboto;
+  font-family: Montserrat;
 }
 
 h1 {
@@ -50,12 +50,12 @@ a {
   flex-direction: column;
   max-width: 768px;
   margin: auto;
-  height: 100vh;
 }
 
 .content {
   display: flex;
   justify-content: center;
+  margin-bottom: 32px;
 }
 
 .row {
@@ -71,26 +71,34 @@ a {
 }
 
 .header {
-  height: 32px;
+  height: 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.header .home {
+  position: relative;
+}
+
+.header .home a {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: center;
 }
 
 .footer .sub-text {
-  color: #7a9cff30;
   margin: 6px;
 }
 
 .list {
-  flex-grow: 1;
-  overflow-y: auto;
 }
 
 .pad-w-6 {
@@ -103,7 +111,7 @@ a {
   position: relative;
   background-color: #fafafa;
   color: #333;
-  margin: 6px 12px;
+  margin: 10px 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
 }
@@ -131,7 +139,7 @@ a {
   justify-content: center;
   align-items: center;
   min-height: 64px;
-  min-width: 128px;
+  min-width: 148px;
 }
 
 .list-item a {
