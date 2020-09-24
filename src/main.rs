@@ -23,7 +23,10 @@ struct PontjesDb(SqliteConnection);
 
 #[get("/")]
 fn index(conn: PontjesDb) -> Template {
-    match gvb_stops::table.load::<models::Stop>(&*conn) {
+    match gvb_stops::table
+        .order(gvb_stops::dsl::stop_name)
+        .load::<models::Stop>(&*conn)
+    {
         Ok(results) => {
             let mut context = HashMap::new();
             context.insert("stops", results);
@@ -79,7 +82,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                 })
                 .collect();
 
-            data.truncate(30);
+            data.truncate(10);
 
             Template::render("upcoming-departures", &data)
         }

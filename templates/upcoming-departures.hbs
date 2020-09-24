@@ -9,21 +9,25 @@
 </head>
 <body>
   <div class="container">
-    <div class="content">
-      {{ #each this }}
-      <div class="list-item">
+    <div class="header"></div>
+    <div class="content column">
+      <div class="list">
         {{ #each this }}
-        <div class="list-item-node">
-          <h4>{{ stop_name }}</h1>
-          <h2>{{ departure_time }}</h2>
+        <div class="list-item">
+          {{ #each this }}
+          <div class="list-item-node">
+            <h4>{{ stop_name }}</h1>
+            <h2>{{ departure_time }}</h2>
+            <a href="/upcoming-departures/{{stop_id}}"></a>
+          </div>
+          {{ /each }}
         </div>
         {{ /each }}
       </div>
-      {{ /each }}
     </div>
-      <div class="footer">
-        <h2 class="sub-text">- Daan 2020</h2>
-      </div>
+    <div class="footer">
+      <h2 class="sub-text">- Daan 2020</h2>
+    </div>
   </div>
 </body>
 </html>
