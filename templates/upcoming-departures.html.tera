@@ -4,13 +4,15 @@
   <div class="list">
     {% for stops in departures %}
     <div class="list-item">
-      {% for s in stops %}
-      <div class="list-item-node">
-        <h4>{{ s.stop_name }}</h1>
-        <h2>{{ s.departure_time }}</h2>
-        <a href="/upcoming-departures/{{s.stop_id}}"></a>
+      <div class="list-item-content">
+        {% for s in stops %}
+        <div class="list-item-node">
+          <h4>{{ s.stop_name }}</h1>
+          <h2>{{ s.departure_time }}</h2>
+          <a href="/upcoming-departures/{{s.stop_id}}"></a>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
     {% endfor %}
   </div>

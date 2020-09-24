@@ -1,7 +1,7 @@
 {% extends "main" %}
 
 {% block content %}
-<div class="content row wrap">
+<div class="content row wrap pad-w-6">
   {% for s in stops %}
   <div class="list-item wrap-item stop">
       <div class="list-item-node">

@@ -26,12 +26,10 @@ html, body, h1, h2, h3, h4, h5 {
 }
 
 body {
-  background-image: linear-gradient(#39667c, #355872);
-  color: #e3e3e3;
+  background: #c7e0f2;
+  color: #fafafa;
   font-weight: 400;
   font-family: Roboto;
-  height: 100vh;
-  overflow-y: hidden;
 }
 
 h1 {
@@ -48,24 +46,16 @@ a {
 
 .container {
   display: flex;
+  position: relative;
   flex-direction: column;
   max-width: 768px;
   margin: auto;
-  padding: 0 16px;
   height: 100vh;
-}
-
-.section {
-  flex-grow: 1;
-  display: flex;
-  min-height: 0;
-  flex-direction: column;
 }
 
 .content {
   display: flex;
   justify-content: center;
-  min-height: 0;
 }
 
 .row {
@@ -85,38 +75,53 @@ a {
 }
 
 .footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
+  justify-content: center;
 }
 
 .footer .sub-text {
-  margin-left: auto;
+  color: #7a9cff30;
+  margin: 6px;
 }
 
 .list {
-  display: flex;
-  flex-direction: column;
   flex-grow: 1;
-  min-height: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
+}
 
+.pad-w-6 {
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 .list-item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  background-color: #e3e3e3;
-  color: #333;
-  margin: 6px 0;
   position: relative;
-  padding: 0 12px;
+  background-color: #fafafa;
+  color: #333;
+  margin: 6px 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
 }
 
+.list-item-content {
+  padding: 6px 12px 4px 12px;
+  width: 100%;
+  overflow-x: auto;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  overflow-x: auto;
+}
+
 .list-item.stop {
-  margin: 4px;
+  margin: 6px 6px;
   justify-content: center;
+  flex-grow: 1;
 }
 
 .list-item-node {
