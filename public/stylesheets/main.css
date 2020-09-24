@@ -26,11 +26,12 @@ html, body, h1, h2, h3, h4, h5 {
 }
 
 body {
-    background-image: linear-gradient(#39667c, #355872);
-  color: #ccc;
+  background-image: linear-gradient(#39667c, #355872);
+  color: #e3e3e3;
   font-weight: 400;
   font-family: Roboto;
   height: 100vh;
+  overflow-y: hidden;
 }
 
 h1 {
@@ -48,16 +49,23 @@ a {
 .container {
   display: flex;
   flex-direction: column;
-  max-width: 800px;
+  max-width: 768px;
   margin: auto;
   padding: 0 16px;
+  height: 100vh;
+}
+
+.section {
+  flex-grow: 1;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
 }
 
 .content {
   display: flex;
-  flex: 1;
-  justify-content: flex-start;
-  overflow-y: scroll;
+  justify-content: center;
+  min-height: 0;
 }
 
 .row {
@@ -87,29 +95,27 @@ a {
 .list {
   display: flex;
   flex-direction: column;
-  min-height: min-content;
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: scroll;
+
 }
 
 .list-item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #e2e2e2;
+  background-color: #e3e3e3;
   color: #333;
   margin: 6px 0;
   position: relative;
   padding: 0 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-
-
-}
-
-.list-item.wrap-item {
-  margin-right: 12px;
-  flex-grow: 1;
+  border-radius: 4px;
 }
 
 .list-item.stop {
+  margin: 4px;
   justify-content: center;
 }
 

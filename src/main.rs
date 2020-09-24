@@ -34,7 +34,9 @@ fn index(conn: PontjesDb) -> Template {
         }
         Err(e) => {
             println!("Error! {}", e);
-            Template::render("error", ())
+            let mut context = HashMap::new();
+            context.insert("msg", String::from("oops"));
+            Template::render("error", context)
         }
     }
 }
@@ -82,7 +84,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                 })
                 .collect();
 
-            data.truncate(10);
+            data.truncate(20);
 
             let mut context = HashMap::new();
             context.insert("departures", data);
@@ -90,7 +92,9 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         }
         Err(e) => {
             println!("Error! {}", e);
-            Template::render("error", ())
+            let mut context = HashMap::new();
+            context.insert("msg", String::from("oops"));
+            Template::render("error", context)
         }
     }
 }

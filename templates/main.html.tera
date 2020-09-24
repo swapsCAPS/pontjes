@@ -9,10 +9,12 @@
   </head>
   <body>
     <div class="container">
-      <div class="header"></div>
-      {% block content %}{% endblock content %}
-      <div class="footer">
-        <h2 class="sub-text">- Daan 2020</h2>
+      <div class="section">
+        <div class="header"></div>
+        {% block content %}{% endblock content %}
+        <div class="footer">
+          <h4 class="sub-text">- Daan 2020</h4>
+        </div>
       </div>
     </div>
   </body>
