@@ -9,14 +9,32 @@ use chrono::Local;
 use diesel::{prelude::*, SqliteConnection};
 use itertools::Itertools;
 use rocket::http::RawStr;
-use rocket_contrib::{serve::StaticFiles, templates::Template};
+use rocket::response::NamedFile;
+use rocket_contrib::templates::Template;
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 use pontjes::schema::gvb_stop_times;
 use pontjes::schema::gvb_stops;
 use pontjes::schema::pont_trips;
 
 use pontjes::models;
+
+struct CachedFile(NamedFile);
+impl<'r> rocket::response::Responder<'r> for CachedFile {
+    fn respond_to(self, req: &rocket::Request) -> rocket::response::Result<'r> {
+        rocket::Response::build_from(self.0.respond_to(req)?)
+            .raw_header("Cache-control", "max-age=86400")
+            .ok()
+    }
+}
+
+#[get("/<file..>")]
+fn cached_files(file: PathBuf) -> Option<CachedFile> {
+    NamedFile::open(Path::new("public/").join(file))
+        .ok()
+        .map(|nf| CachedFile(nf))
+}
 
 #[database("pontjes_db")]
 struct PontjesDb(SqliteConnection);
@@ -103,7 +121,7 @@ fn main() {
     rocket::ignite()
         .attach(PontjesDb::fairing())
         .mount("/", routes![index, stop])
-        .mount("/public", StaticFiles::from("./public"))
+        .mount("/public", routes![cached_files])
         .attach(Template::fairing())
         .launch();
 }
