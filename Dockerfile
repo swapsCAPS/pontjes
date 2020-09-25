@@ -1,7 +1,10 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
+
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt update
-RUN apt install -Y libsqlite3-dev sqlite3
+RUN apt install -y curl unzip libsqlite3-dev sqlite3
 
 COPY import.sql /
 COPY init_tables.sql /

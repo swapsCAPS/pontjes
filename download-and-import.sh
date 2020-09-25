@@ -1,8 +1,8 @@
 #!/bin/bash
-mkdir -p gtfs
-rm -rf gtfs/*
+mkdir -p data/gtfs
+rm -rf data/gtfs/*
 curl http://gtfs.ovapi.nl/nl/gtfs-nl.zip -o gtfs-nl.zip
-cd gtfs
-unzip ../gtfs-nl.zip
-cd ..
+cd data/gtfs
+unzip ../../gtfs-nl.zip
+cd ../..
 ./full-import.sh

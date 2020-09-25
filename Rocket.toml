@@ -1,5 +1,5 @@
 [global.databases]
-pontjes_db = { url = "./db" }
+pontjes_db = { url = "data/pontjes_db" }
 
 [global]
 address = "0.0.0.0"

@@ -5,7 +5,8 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 
-use chrono::Local;
+use chrono::{Local, TimeZone, Utc};
+use chrono_tz::Europe::Amsterdam;
 use diesel::{prelude::*, SqliteConnection};
 use itertools::Itertools;
 use rocket::http::RawStr;
@@ -61,12 +62,13 @@ fn index(conn: PontjesDb) -> Template {
 
 #[get("/upcoming-departures/<sid>")]
 fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
-    let now = Local::now();
-    let today = now.format("%Y%m%d").to_string();
-    let tomorrow = (now + chrono::Duration::days(1))
+    let now = Utc::now();
+    let amsterdam_now = now.with_timezone(&Amsterdam);
+    let today = amsterdam_now.format("%Y%m%d").to_string();
+    let tomorrow = (amsterdam_now + chrono::Duration::days(1))
         .format("%Y%m%d")
         .to_string();
-    let time = now.format("%H:%M").to_string();
+    let time = amsterdam_now.format("%H:%M").to_string();
 
     let trip_ids = gvb_stop_times::table
         .select(gvb_stop_times::dsl::trip_id)

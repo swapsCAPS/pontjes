@@ -26,8 +26,8 @@ html, body, h1, h2, h3, h4, h5 {
 }
 
 body {
-  background: #c7e0f2;
-  color: #fafafa;
+  background: #59809a;
+  color: #fff;
   font-weight: 400;
   font-family: Montserrat;
 }
@@ -49,6 +49,8 @@ a {
   position: relative;
   flex-direction: column;
   max-width: 768px;
+  margin: auto;
+  max-width: 500px;
   margin: auto;
 }
 
@@ -109,7 +111,7 @@ a {
 .list-item {
   display: flex;
   position: relative;
-  background-color: #fafafa;
+  background-color: #fff;
   color: #333;
   margin: 10px 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);

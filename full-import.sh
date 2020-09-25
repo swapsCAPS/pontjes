@@ -1,3 +1,3 @@
 #!/bin/bash
-sqlite3 db ".read import.sql"
-sqlite3 db ".read init_tables.sql"
+sqlite3 data/pontjes_db ".read import.sql"
+sqlite3 data/pontjes_db ".read init_tables.sql"

@@ -1,8 +1,9 @@
 version: "3.8"
 services:
   pontjes:
+    container_name: pontjes
     build: .
     ports:
       - "6376:6376"
     volumes:
-      - /data/db:/db
+      - /data:/data
