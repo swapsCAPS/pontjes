@@ -5,5 +5,3 @@ services:
     build: .
     ports:
       - "6376:6376"
-    volumes:
-      - data:/data
