@@ -12,6 +12,7 @@ use itertools::Itertools;
 use rocket::http::RawStr;
 use rocket::response::NamedFile;
 use rocket_contrib::templates::Template;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -28,6 +29,12 @@ impl<'r> rocket::response::Responder<'r> for CachedFile {
             .raw_header("Cache-control", "max-age=86400")
             .ok()
     }
+}
+
+#[derive(Serialize)]
+struct Context<'a> {
+    requested_stop: &'a str,
+    departures: Vec<&'a Vec<models::Row>>,
 }
 
 #[get("/<file..>")]
@@ -69,10 +76,11 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         .format("%Y%m%d")
         .to_string();
     let time = amsterdam_now.format("%H:%M").to_string();
+    let sid = sid.as_str();
 
     let trip_ids = gvb_stop_times::table
         .select(gvb_stop_times::dsl::trip_id)
-        .filter(gvb_stop_times::dsl::stop_id.eq(sid.as_str()));
+        .filter(gvb_stop_times::dsl::stop_id.eq(sid));
     let query = pont_trips::dsl::date
         .eq(today)
         .and(pont_trips::dsl::departure_time.gt(time))
@@ -95,10 +103,10 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             let mut data: Vec<&Vec<models::Row>> = group_map
                 .values()
-                .filter(|row| row[row.len() - 1].stop_id != sid.as_str())
+                .filter(|row| row[row.len() - 1].stop_id != sid)
                 .sorted_by(|a, b| {
-                    let a_stop_id = pontjes::get_requested_stop(a, sid.as_str());
-                    let b_stop_id = pontjes::get_requested_stop(b, sid.as_str());
+                    let a_stop_id = pontjes::get_requested_stop(a, sid);
+                    let b_stop_id = pontjes::get_requested_stop(b, sid);
 
                     Ord::cmp(&a_stop_id, &b_stop_id)
                 })
@@ -106,8 +114,10 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             data.truncate(32);
 
-            let mut context = HashMap::new();
-            context.insert("departures", data);
+            let context = Context {
+                requested_stop: sid,
+                departures: data,
+            };
             Template::render("upcoming-departures", &context)
         }
         Err(e) => {
