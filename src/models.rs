@@ -1,12 +1,13 @@
 use diesel::Queryable;
+use serde::Serialize;
 
-#[derive(serde::Serialize, Queryable, Debug)]
+#[derive(Serialize, Queryable, Debug)]
 pub struct Route {
     pub route_id: String,
     pub route_long_name: String,
 }
 
-#[derive(serde::Serialize, Queryable, Debug)]
+#[derive(Serialize, Queryable, Debug)]
 pub struct Stop {
     pub stop_id: String,
     pub stop_code: String,
@@ -21,7 +22,7 @@ pub struct Stop {
     pub zone_id: String,
 }
 
-#[derive(serde::Serialize, Queryable, Debug)]
+#[derive(Serialize, Queryable, Debug)]
 pub struct Row {
     pub route_long_name: String,
     pub date: String,
@@ -31,4 +32,20 @@ pub struct Row {
     pub trip_headsign: String,
     pub trip_id: String,
     pub stop_sequence: String,
+}
+
+#[derive(Serialize)]
+pub struct ListItemStop<'a> {
+    pub date: &'a str,
+    pub time: &'a str,
+    pub stop_name: &'a str,
+}
+
+#[derive(Serialize)]
+pub struct ListItem<'a> {
+    pub prev_stops: Vec<ListItemStop<'a>>,
+    pub date: &'a str,
+    pub time: &'a str,
+    pub next_stops: Vec<ListItemStop<'a>>,
+    pub end_stop: ListItemStop<'a>,
 }

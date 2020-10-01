@@ -34,7 +34,7 @@ impl<'r> rocket::response::Responder<'r> for CachedFile {
 #[derive(Serialize)]
 struct Context<'a> {
     requested_stop: &'a str,
-    departures: Vec<&'a Vec<models::Row>>,
+    list_items: Vec<models::ListItem<'a>>,
 }
 
 #[get("/<file..>")]
@@ -75,12 +75,14 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     let tomorrow = (amsterdam_now + chrono::Duration::days(1))
         .format("%Y%m%d")
         .to_string();
-    let time = amsterdam_now.format("%H:%M").to_string();
+    let time = "21:55"; //amsterdam_now.format("%H:%M").to_string();
     let sid = sid.as_str();
 
+    // Get all trip ids for this stop_id
     let trip_ids = gvb_stop_times::table
         .select(gvb_stop_times::dsl::trip_id)
         .filter(gvb_stop_times::dsl::stop_id.eq(sid));
+    // Get all enriched rows with these trip_ids and current time
     let query = pont_trips::dsl::date
         .eq(today)
         .and(pont_trips::dsl::departure_time.gt(time))
@@ -101,22 +103,35 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             let group_map = tuples.into_iter().into_group_map();
 
-            let mut data: Vec<&Vec<models::Row>> = group_map
+            let mut list_items: Vec<models::ListItem> = group_map
                 .values()
-                .filter(|row| row[row.len() - 1].stop_id != sid)
-                .sorted_by(|a, b| {
-                    let a_stop_id = pontjes::get_requested_stop(a, sid);
-                    let b_stop_id = pontjes::get_requested_stop(b, sid);
-
-                    Ord::cmp(&a_stop_id, &b_stop_id)
+                // TODO The length filter is prolly too naive
+                .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
+                .map(|trip| {
+                    println!("sid {:?}", sid);
+                    println!("trip {:?}", trip);
+                    let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
+                    let last = &trip[trip.len() - 1];
+                    models::ListItem {
+                        date: &active_stop.date,
+                        time: &active_stop.departure_time,
+                        prev_stops: vec![],
+                        next_stops: vec![],
+                        end_stop: models::ListItemStop {
+                            date: &last.date,
+                            time: &last.departure_time,
+                            stop_name: &last.stop_name,
+                        },
+                    }
                 })
-                .collect();
+                .sorted_by_key(|list_item| (list_item.date, list_item.time))
+                .collect_vec();
 
-            data.truncate(32);
+            list_items.truncate(32);
 
             let context = Context {
                 requested_stop: sid,
-                departures: data,
+                list_items,
             };
             Template::render("upcoming-departures", &context)
         }

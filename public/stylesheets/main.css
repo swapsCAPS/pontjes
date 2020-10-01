@@ -50,7 +50,7 @@ a {
   flex-direction: column;
   max-width: 768px;
   margin: auto;
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
 }
 
@@ -100,9 +100,6 @@ a {
   margin: 6px;
 }
 
-.list {
-}
-
 .pad-w-6 {
   padding-left: 6px;
   padding-right: 6px;
@@ -110,22 +107,52 @@ a {
 
 .list-item {
   display: flex;
+  justify-content: space-between;
   position: relative;
   background-color: #fafafa;
   color: #333;
-  margin: 10px 12px;
+  margin: 12px 0;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
+  padding: 8px;
+  white-space: nowrap;
+  flex-direction: row;
+  align-items: center;
 }
 
-.list-item-content {
-  padding: 6px 12px 4px 12px;
-  width: 100%;
-  overflow-x: auto;
-  flex-direction: row;
+.list-item h1 {
+  line-height: .75;
+  font-size: 60px;
+}
+
+.list-item .stops {
   display: flex;
-  justify-content: space-between;
-  overflow-x: auto;
+  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.list-item .stops .arrival-time {
+  display: flex;
+  min-width: 48px;
+  justify-content: flex-end;
+}
+
+.list-item .other-stop {
+  display: flex;
+  flex-direction: row;
+}
+
+.list-item .end-stop {
+  display: flex;
+}
+
+.list-item .end-stop h2 {
+  line-height: .75;
+  font-size: 24pt;
+}
+.list-item .end-stop span {
+  line-height: .75;
 }
 
 .list-item.stop {
@@ -152,4 +179,3 @@ a {
   bottom: 0;
   right: 0;
 }
-
