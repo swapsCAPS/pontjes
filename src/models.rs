@@ -41,11 +41,20 @@ pub struct ListItemStop<'a> {
     pub stop_name: &'a str,
 }
 
+// impl<'a> From<Row> for ListItemStop<'a> {
+// fn from(row: Row) -> ListItemStop<'a> {
+// ListItemStop {
+// date: &row.date,
+// time: &row.departure_time,
+// stop_name: &row.stop_name,
+// }
+// }
+// }
+
 #[derive(Serialize)]
 pub struct ListItem<'a> {
-    pub prev_stops: Vec<ListItemStop<'a>>,
     pub date: &'a str,
     pub time: &'a str,
-    pub next_stops: Vec<ListItemStop<'a>>,
+    pub rest_stops: Vec<ListItemStop<'a>>,
     pub end_stop: ListItemStop<'a>,
 }

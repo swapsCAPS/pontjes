@@ -6,9 +6,14 @@
     <div class="list-item">
       <h1>{{ list_item.time }}</h1>
       <div class="stops">
-        <div class="other-stop">
-          <span>via: Pontsteiger</span>
-          <div class="arrival-time"><span>23:37</span></div>
+        <div class="other-stops">
+          {% if list_item.rest_stops | length > 0 %}
+          <span>via: </span>
+          {% for stop in list_item.rest_stops %}
+          <span>{{ stop.stop_name }}</span>
+          <span>{{ stop.time }}</span>
+          {% endfor %}
+          {% endif %}
         </div>
         <div class="end-stop">
           <h2>{{ list_item.end_stop.stop_name }}</h2>

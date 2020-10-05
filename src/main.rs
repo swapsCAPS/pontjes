@@ -112,11 +112,22 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                     println!("trip {:?}", trip);
                     let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
                     let last = &trip[trip.len() - 1];
+                    let mut rest_stops = trip
+                        .iter()
+                        .filter(|x| x.stop_id != sid)
+                        .map(|row| models::ListItemStop {
+                            date: &row.date,
+                            time: &row.departure_time,
+                            stop_name: &row.stop_name,
+                        })
+                        .collect_vec();
+
+                    rest_stops.pop();
+
                     models::ListItem {
                         date: &active_stop.date,
                         time: &active_stop.departure_time,
-                        prev_stops: vec![],
-                        next_stops: vec![],
+                        rest_stops,
                         end_stop: models::ListItemStop {
                             date: &last.date,
                             time: &last.departure_time,
