@@ -70,7 +70,7 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     let tomorrow = (amsterdam_now + chrono::Duration::days(1))
         .format("%Y%m%d")
         .to_string();
-    let time = "21:55"; //amsterdam_now.format("%H:%M").to_string();
+    let time = amsterdam_now.format("%H:%M").to_string();
     let sid = sid.as_str();
 
     // Get all trip ids for this stop_id
@@ -103,8 +103,6 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
                 // TODO The length filter is prolly too naive
                 .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
                 .map(|trip| {
-                    println!("sid {:?}", sid);
-                    println!("trip {:?}", trip);
                     let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
                     let last = &trip[trip.len() - 1];
                     let mut rest_stops = trip

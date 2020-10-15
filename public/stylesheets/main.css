@@ -1,15 +1,4 @@
 @font-face {
-  font-family: Montserrat;
-  src: url(/public/fonts/Montserrat-Regular.ttf);
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url(/public/fonts/Montserrat-Bold.ttf);
-  font-weight: bold;
-}
-
-@font-face {
   font-family: Roboto;
   src: url(/public/fonts/Roboto-Regular.ttf);
 }
@@ -21,24 +10,19 @@
 }
 
 html, body, h1, h2, h3, h4, h5 {
-  margin: 0px !important;
-  padding: 0px !important;
-  line-height: 1.0 !important;
-}
-
-body {
-  background: #7cabcb;
-  color: #fafafa;
-  font-weight: 400;
-  font-family: Montserrat;
+  margin: 0px;
+  padding: 0px;
 }
 
 a {
   text-decoration:none;
 }
 
-span {
-  font-size: 12pt;
+body {
+  background: #7cabcb;
+  color: #fafafa;
+  font-weight: 400;
+  font-family: Roboto;
 }
 
 .container {
@@ -77,6 +61,10 @@ span {
   position: relative;
 }
 
+.header .home h1 {
+  font-size: 50px;
+}
+
 .header .home a {
   position: absolute;
   display: block;
@@ -84,6 +72,11 @@ span {
   left: 0;
   bottom: 0;
   right: 0;
+}
+
+.title {
+  margin: 6px 0;
+  text-align: center;
 }
 
 .footer {
@@ -101,60 +94,57 @@ span {
 }
 
 .list-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
-  position: relative;
   background-color: #fafafa;
   color: #333;
-  margin: 12px;
+  margin: 0 12px 12px 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
   padding: 9px 9px 10px 9px;
   white-space: nowrap;
   flex-direction: row;
   align-items: flex-end;
-  overflow: hidden;
 }
 
-/* .list-item h1, h2, h3, h4 { */
-  /* line-height: .75; */
-/* } */
+.list-item h1 {
+  font-size: 36px;
+  line-height: 26px;
+}
+
+.list-item h3 {
+  font-size: 18.72px;
+  line-height: 14px;
+}
+
+.list-item span {
+  font-size: 16px;
+  line-height: 12px;
+}
 
 .list-item .stops {
   display: flex;
-  justify-content: flex-end;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.list-item .stops .arrival-time {
-  display: flex;
-  min-width: 48px;
-  justify-content: flex-end;
+.list-item .stops .stop-time {
+  margin-left: 6px;
 }
 
-.list-item .other-stop {
+.list-item .stops .other-stops {
   display: flex;
-  flex-direction: row;
+  align-items: baseline;
+  margin-bottom: 6px;
 }
 
-.list-item .end-stop {
+.list-item .stops .end-stop {
   display: flex;
-  align-items: flex-end;
+  align-items: baseline;
 }
 
-.list-item .end-stop h2 {
-  font-size: 24pt;
-  display: flex;
-  align-items: center;
-}
-
-.list-item .end-stop span {
-  display: flex;
-  align-items: center;
-}
-
-.list-item.stop {
+.list-item.from-stop {
   margin: 6px 6px;
   justify-content: center;
   flex-grow: 1;
@@ -179,6 +169,3 @@ span {
   right: 0;
 }
 
-.center-text {
-  text-align: center;
-}

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="content row wrap pad-w-6 mar-t-16">
   {% for s in stops %}
-  <div class="list-item wrap-item stop">
+  <div class="list-item from-stop">
       <div class="list-item-node">
         <h4>{{ s.stop_name }}</h4>
       </div>

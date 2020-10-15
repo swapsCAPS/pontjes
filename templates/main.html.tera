@@ -15,10 +15,10 @@
           <a href="/"></a>
         </div>
       </div>
-      <h1 class="center-text">{{ title }}</h1>
+      <h1 class="title">{{ title }}</h1>
       {% block content %}{% endblock content %}
       <div class="footer">
-        <h4 class="sub-text">Daan 2020</h4>
+        <h4 class="sub-text">❤ Daan 2020</h4>
       </div>
     </div>
   </body>
