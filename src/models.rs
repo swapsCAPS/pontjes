@@ -58,3 +58,17 @@ pub struct ListItem<'a> {
     pub rest_stops: Vec<ListItemStop<'a>>,
     pub end_stop: ListItemStop<'a>,
 }
+
+#[derive(Serialize)]
+pub struct IndexCtx<'a> {
+    pub title: &'a str,
+    pub stops: Vec<Stop>,
+}
+
+#[derive(Serialize)]
+pub struct DeparturesCtx<'a> {
+    pub title: &'a str,
+    pub requested_stop: &'a str,
+    pub list_items: Vec<ListItem<'a>>,
+}
+

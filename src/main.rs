@@ -5,14 +5,13 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 
-use chrono::{Local, TimeZone, Utc};
+use chrono::Utc;
 use chrono_tz::Europe::Amsterdam;
 use diesel::{prelude::*, SqliteConnection};
 use itertools::Itertools;
 use rocket::http::RawStr;
 use rocket::response::NamedFile;
 use rocket_contrib::templates::Template;
-use serde::Serialize;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -29,12 +28,6 @@ impl<'r> rocket::response::Responder<'r> for CachedFile {
             .raw_header("Cache-control", "max-age=86400")
             .ok()
     }
-}
-
-#[derive(Serialize)]
-struct Context<'a> {
-    requested_stop: &'a str,
-    list_items: Vec<models::ListItem<'a>>,
 }
 
 #[get("/<file..>")]
@@ -54,8 +47,10 @@ fn index(conn: PontjesDb) -> Template {
         .load::<models::Stop>(&*conn)
     {
         Ok(results) => {
-            let mut context = HashMap::new();
-            context.insert("stops", results);
+            let context = models::IndexCtx {
+                stops: results,
+                title: "Vanaf",
+            };
             Template::render("index", &context)
         }
         Err(e) => {
@@ -140,11 +135,22 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             list_items.truncate(32);
 
-            let context = Context {
-                requested_stop: sid,
-                list_items,
-            };
-            Template::render("upcoming-departures", &context)
+            match gvb_stops::table.find(sid).first::<models::Stop>(&*conn) {
+                Ok(stop) => {
+                    let context = models::DeparturesCtx {
+                        title: &format!("Van {}", stop.stop_name),
+                        requested_stop: sid,
+                        list_items,
+                    };
+                    Template::render("upcoming-departures", &context)
+                }
+                Err(e) => {
+                    println!("Error! {}", e);
+                    let mut context = HashMap::new();
+                    context.insert("msg", String::from("oops"));
+                    Template::render("error", context)
+                }
+            }
         }
         Err(e) => {
             println!("Error! {}", e);
