@@ -109,7 +109,7 @@ body {
   align-items: flex-end;
   white-space: nowrap;
   justify-content: space-between;
-  padding: 9px 9px 10px 9px;
+  padding: 9px 0px 10px 9px;
 }
 
 .list-item h1 {
@@ -135,6 +135,7 @@ body {
 
 .list-item .stops .stop-time {
   margin-left: 6px;
+  margin-right: 9px;
 }
 
 .list-item .stops .other-stops {
