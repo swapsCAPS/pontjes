@@ -151,11 +151,14 @@ span {
 }
 
 .list-item .end-stop h2 {
-  line-height: .75;
   font-size: 24pt;
+    display: flex;
+    align-items: center;
 }
+
 .list-item .end-stop span {
-  line-height: .75;
+    display: flex;
+    align-items: center;
 }
 
 .list-item.stop {
