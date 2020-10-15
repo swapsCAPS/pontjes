@@ -95,17 +95,21 @@ body {
 
 .list-item {
   position: relative;
-  display: flex;
-  justify-content: space-between;
   background-color: #fafafa;
   color: #333;
   margin: 0 12px 12px 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
-  padding: 9px 9px 10px 9px;
-  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+.list-item-content {
+  display: flex;
   flex-direction: row;
   align-items: flex-end;
+  white-space: nowrap;
+  justify-content: space-between;
+  padding: 9px 9px 10px 9px;
 }
 
 .list-item h1 {
