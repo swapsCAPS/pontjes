@@ -21,8 +21,9 @@
 }
 
 html, body, h1, h2, h3, h4, h5 {
-  margin: 0;
-  padding: 0;
+  margin: 0px !important;
+  padding: 0px !important;
+  line-height: 1.0 !important;
 }
 
 body {
@@ -30,14 +31,6 @@ body {
   color: #fafafa;
   font-weight: 400;
   font-family: Montserrat;
-}
-
-h1 {
-  font-size: 48pt;
-}
-
-h2 {
-  font-size: 24pt;
 }
 
 a {
@@ -55,7 +48,6 @@ span {
   max-width: 768px;
   margin: auto;
   max-width: 600px;
-  margin: auto;
 }
 
 .content {
@@ -77,7 +69,6 @@ span {
 }
 
 .header {
-  height: 64px;
   display: flex;
   justify-content: center;
 }
@@ -101,7 +92,7 @@ span {
 }
 
 .footer .sub-text {
-  margin: 6px;
+  margin: 22px;
 }
 
 .pad-w-6 {
@@ -115,18 +106,19 @@ span {
   position: relative;
   background-color: #fafafa;
   color: #333;
-  margin: 12px 0;
+  margin: 12px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
-  padding: 8px;
+  padding: 9px 9px 10px 9px;
   white-space: nowrap;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
+  overflow: hidden;
 }
 
-.list-item h1 {
-  line-height: .75;
-}
+/* .list-item h1, h2, h3, h4 { */
+  /* line-height: .75; */
+/* } */
 
 .list-item .stops {
   display: flex;
@@ -148,17 +140,18 @@ span {
 
 .list-item .end-stop {
   display: flex;
+  align-items: flex-end;
 }
 
 .list-item .end-stop h2 {
   font-size: 24pt;
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .list-item .end-stop span {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .list-item.stop {
@@ -184,4 +177,8 @@ span {
   left: 0;
   bottom: 0;
   right: 0;
+}
+
+.center-text {
+  text-align: center;
 }
