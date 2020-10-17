@@ -7,6 +7,19 @@ pub struct Route {
     pub route_long_name: String,
 }
 
+pub struct Joined {
+    pub route_id: String,
+    pub route_long_name: String,
+    pub route_short_name: String,
+    pub date: String,
+    pub departure_time: String,
+    pub stop_name: String,
+    pub stop_id: String,
+    pub trip_headsign: String,
+    pub trip_id: String,
+    pub stop_sequence: String,
+}
+
 #[derive(Serialize, Queryable, Debug)]
 pub struct Stop {
     pub stop_id: String,
@@ -71,4 +84,3 @@ pub struct DeparturesCtx<'a> {
     pub requested_stop: &'a str,
     pub list_items: Vec<ListItem<'a>>,
 }
-

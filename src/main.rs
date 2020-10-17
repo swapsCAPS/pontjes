@@ -15,9 +15,14 @@ use rocket_contrib::templates::Template;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
+use pontjes::schema::calendar_dates as cd;
 use pontjes::schema::gvb_stop_times;
 use pontjes::schema::gvb_stops;
 use pontjes::schema::pont_trips;
+use pontjes::schema::routes;
+use pontjes::schema::stop_times;
+use pontjes::schema::stops;
+use pontjes::schema::trips;
 
 use pontjes::models;
 
@@ -73,23 +78,38 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     let time = amsterdam_now.format("%H:%M").to_string();
     let sid = sid.as_str();
 
-    // Get all trip ids for this stop_id
-    let trip_ids = gvb_stop_times::table
-        .select(gvb_stop_times::dsl::trip_id)
-        .filter(gvb_stop_times::dsl::stop_id.eq(sid));
-    // Get all enriched rows with these trip_ids and current time
-    let query = pont_trips::dsl::date
-        .eq(today)
-        .and(pont_trips::dsl::departure_time.gt(time))
-        .or(pont_trips::dsl::date.eq(tomorrow))
-        .and(pont_trips::dsl::trip_id.eq_any(trip_ids));
+    let result = routes::table
+        .filter(
+            routes::dsl::agency_id
+                .eq("GVB")
+                .and(routes::dsl::route_url.like("%veerboot%")),
+        )
+        .inner_join(trips::table.on(trips::dsl::route_id.eq(routes::dsl::route_id)))
+        .inner_join(cd::table.on(cd::dsl::service_id.eq(trips::dsl::service_id)))
+        .inner_join(stop_times::table.on(stop_times::dsl::trip_id.eq(trips::dsl::trip_id)))
+        .inner_join(stops::table.on(stops::dsl::stop_id.eq(stop_times::dsl::stop_id)))
+        .filter(stops::dsl::stop_id.eq(sid))
+        .filter(
+            cd::dsl::date
+                .eq(today)
+                .and(stop_times::dsl::departure_time.gt(time))
+                .or(cd::dsl::date.eq(tomorrow)),
+        )
+        .select((
+            routes::dsl::route_long_name,
+            cd::dsl::date,
+            stop_times::dsl::departure_time,
+            stops::dsl::stop_name,
+            stops::dsl::stop_id,
+            trips::dsl::trip_headsign,
+            trips::dsl::trip_id,
+            stop_times::dsl::stop_sequence,
+        ))
+        .order(cd::dsl::date)
+        .then_order_by(stop_times::dsl::departure_time)
+        .load::<models::Row>(&*conn);
 
-    match pont_trips::table
-        .filter(query)
-        .order(pont_trips::dsl::date)
-        .then_order_by(pont_trips::dsl::departure_time)
-        .load::<models::Row>(&*conn)
-    {
+    match result {
         Ok(results) => {
             let tuples: Vec<(String, models::Row)> = results
                 .into_iter()
