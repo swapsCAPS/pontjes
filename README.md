@@ -27,6 +27,7 @@ cargo run
 ```
 
 ## TODO
+- [ ] Add favicon!
 - [ ] Compare joins vs pre imported data performance
 - [ ] Change "via" to "van" if "other" stop time is before selected stop time
 - [ ] Set up ARM cross compilation docker build
