@@ -109,3 +109,4 @@ table! {
 
 allow_tables_to_appear_in_same_query!(pont_trips, gvb_stop_times); // sErioUsLy?!
 allow_tables_to_appear_in_same_query!(routes, trips, calendar_dates, stop_times, stops); // sErioUsLy?!
+

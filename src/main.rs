@@ -16,11 +16,9 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use pontjes::schema::calendar_dates as cd;
-use pontjes::schema::gvb_stop_times;
 use pontjes::schema::gvb_stops;
-use pontjes::schema::pont_trips;
 use pontjes::schema::routes;
-use pontjes::schema::stop_times;
+use pontjes::schema::stop_times as st;
 use pontjes::schema::stops;
 use pontjes::schema::trips;
 
@@ -78,45 +76,74 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     let time = amsterdam_now.format("%H:%M").to_string();
     let sid = sid.as_str();
 
-    let result = routes::table
-        .filter(
-            routes::dsl::agency_id
-                .eq("GVB")
-                .and(routes::dsl::route_url.like("%veerboot%")),
+    // I need all the trips for this date that contain the selected stop_id ✓
+    // with these trips I then need to get all stop times
+    let gvb_routes = routes::table
+        .filter(routes::dsl::route_url.like("%veerboot%"))
+        .select(routes::dsl::route_id);
+
+    let trip_ids = cd::table
+        .filter(cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
+        .inner_join(
+            trips::table.on(trips::dsl::service_id
+                .eq(cd::dsl::service_id)
+                .and(trips::dsl::route_id.eq_any(gvb_routes))),
         )
-        .inner_join(trips::table.on(trips::dsl::route_id.eq(routes::dsl::route_id)))
-        .inner_join(cd::table.on(cd::dsl::service_id.eq(trips::dsl::service_id)))
-        .inner_join(stop_times::table.on(stop_times::dsl::trip_id.eq(trips::dsl::trip_id)))
-        .inner_join(stops::table.on(stops::dsl::stop_id.eq(stop_times::dsl::stop_id)))
-        .filter(stops::dsl::stop_id.eq(sid))
-        .filter(
-            cd::dsl::date
-                .eq(today)
-                .and(stop_times::dsl::departure_time.gt(time))
-                .or(cd::dsl::date.eq(tomorrow)),
+        .select(trips::dsl::trip_id);
+
+    let trips_that_contain_sid = st::table
+        .filter(st::dsl::stop_id.eq(sid))
+        .select(st::dsl::trip_id)
+        .distinct();
+
+    let hydrated = trips::table
+        .filter(trips::dsl::trip_id.eq_any(trips_that_contain_sid))
+        .inner_join(st::table.on(st::trip_id.eq(trips::dsl::trip_id)));
+
+    let query = cd::table
+        .filter(cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
+        .inner_join(trips::table.on(trips::dsl::service_id.eq(cd::dsl::service_id)))
+        .inner_join(st::table.on(trips::dsl::trip_id.eq(st::dsl::trip_id)))
+        .inner_join(
+            routes::table.on(routes::dsl::route_url
+                .like("%veerboot%")
+                .and(routes::dsl::route_id.eq(trips::dsl::route_id))),
         )
+        .inner_join(stops::table.on(stops::dsl::stop_id.eq(st::dsl::stop_id)))
         .select((
             routes::dsl::route_long_name,
             cd::dsl::date,
-            stop_times::dsl::departure_time,
+            st::dsl::departure_time,
             stops::dsl::stop_name,
-            stops::dsl::stop_id,
+            st::dsl::stop_id,
             trips::dsl::trip_headsign,
             trips::dsl::trip_id,
-            stop_times::dsl::stop_sequence,
+            st::dsl::stop_sequence,
         ))
+        .filter(
+            cd::dsl::date.eq(&today).and(
+                st::dsl::departure_time
+                    .gt(time)
+                    .or(cd::dsl::date.eq(&tomorrow)),
+            ),
+        )
         .order(cd::dsl::date)
-        .then_order_by(stop_times::dsl::departure_time)
-        .load::<models::Row>(&*conn);
+        .then_order_by(st::dsl::departure_time);
 
-    match result {
+    let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query);
+    println!("{:?}", sql);
+    println!("{:?}", sql);
+
+    match query.load::<models::Row>(&*conn) {
         Ok(results) => {
+            println!("results {:?}", results);
             let tuples: Vec<(String, models::Row)> = results
                 .into_iter()
                 .map(|r| (format!("{}{}", r.date, r.trip_id), r))
                 .collect_vec();
 
             let group_map = tuples.into_iter().into_group_map();
+            println!("group_map {:?}", group_map);
 
             let mut list_items: Vec<models::ListItem> = group_map
                 .values()
