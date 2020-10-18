@@ -37,12 +37,10 @@ pub struct Stop {
 
 #[derive(Serialize, Queryable, Debug)]
 pub struct Row {
-    pub route_long_name: String,
     pub date: String,
     pub departure_time: String,
     pub stop_name: String,
     pub stop_id: String,
-    pub trip_headsign: String,
     pub trip_id: String,
     pub stop_sequence: String,
 }

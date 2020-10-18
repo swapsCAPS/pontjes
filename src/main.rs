@@ -17,7 +17,6 @@ use std::path::{Path, PathBuf};
 
 use pontjes::schema::calendar_dates as cd;
 use pontjes::schema::gvb_stops;
-use pontjes::schema::routes;
 use pontjes::schema::stop_times as st;
 use pontjes::schema::stops;
 use pontjes::schema::trips;
@@ -76,63 +75,45 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
     let time = amsterdam_now.format("%H:%M").to_string();
     let sid = sid.as_str();
 
-    // I need all the trips for this date that contain the selected stop_id ✓
-    // with these trips I then need to get all stop times
-    let gvb_routes = routes::table
-        .filter(routes::dsl::route_url.like("%veerboot%"))
-        .select(routes::dsl::route_id);
-
-    let trip_ids = cd::table
-        .filter(cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
+    let trips_that_have_sid: Vec<String> = st::table
+        .inner_join(trips::table.on(trips::dsl::trip_id.eq(st::dsl::trip_id)))
         .inner_join(
-            trips::table.on(trips::dsl::service_id
-                .eq(cd::dsl::service_id)
-                .and(trips::dsl::route_id.eq_any(gvb_routes))),
+            cd::table.on((cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
+                .and(cd::dsl::service_id.eq(trips::dsl::service_id))),
         )
-        .select(trips::dsl::trip_id);
-
-    let trips_that_contain_sid = st::table
-        .filter(st::dsl::stop_id.eq(sid))
+        .filter(st::dsl::stop_id.eq(&sid))
         .select(st::dsl::trip_id)
-        .distinct();
+        .distinct()
+        .load(&*conn)
+        .unwrap();
 
-    let hydrated = trips::table
-        .filter(trips::dsl::trip_id.eq_any(trips_that_contain_sid))
-        .inner_join(st::table.on(st::trip_id.eq(trips::dsl::trip_id)));
-
-    let query = cd::table
-        .filter(cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
-        .inner_join(trips::table.on(trips::dsl::service_id.eq(cd::dsl::service_id)))
-        .inner_join(st::table.on(trips::dsl::trip_id.eq(st::dsl::trip_id)))
+    let query = trips::table
         .inner_join(
-            routes::table.on(routes::dsl::route_url
-                .like("%veerboot%")
-                .and(routes::dsl::route_id.eq(trips::dsl::route_id))),
+            cd::table.on((cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
+                .and(cd::dsl::service_id.eq(trips::dsl::service_id))),
         )
+        .inner_join(st::table.on(st::dsl::trip_id.eq(trips::dsl::trip_id)))
         .inner_join(stops::table.on(stops::dsl::stop_id.eq(st::dsl::stop_id)))
-        .select((
-            routes::dsl::route_long_name,
-            cd::dsl::date,
-            st::dsl::departure_time,
-            stops::dsl::stop_name,
-            st::dsl::stop_id,
-            trips::dsl::trip_headsign,
-            trips::dsl::trip_id,
-            st::dsl::stop_sequence,
-        ))
         .filter(
-            cd::dsl::date.eq(&today).and(
+            trips::dsl::trip_id.eq_any(trips_that_have_sid).and(
                 st::dsl::departure_time
                     .gt(time)
                     .or(cd::dsl::date.eq(&tomorrow)),
             ),
         )
         .order(cd::dsl::date)
-        .then_order_by(st::dsl::departure_time);
+        .then_order_by(st::dsl::departure_time)
+        .select((
+            cd::dsl::date,
+            st::dsl::departure_time,
+            stops::dsl::stop_name,
+            st::dsl::stop_id,
+            st::dsl::trip_id,
+            st::dsl::stop_sequence,
+        ));
 
     let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query);
-    println!("{:?}", sql);
-    println!("{:?}", sql);
+    println!("query {:?}", sql);
 
     match query.load::<models::Row>(&*conn) {
         Ok(results) => {

@@ -13,6 +13,7 @@ delete from routes;
 create unique index if not exists stops_stop_id on stops (stop_id);
 
 create index if not exists cd_service_id on calendar_dates (service_id);
+create index if not exists cd_date on calendar_dates (date);
 
 create unique index if not exists trips_trip_id on trips (trip_id);
 create index if not exists trips_route_id on trips (route_id);
