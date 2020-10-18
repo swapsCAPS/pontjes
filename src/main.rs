@@ -75,8 +75,9 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
     // Get all trip ids for this stop_id
     let trip_ids = gvb_stop_times::table
-        .select(gvb_stop_times::dsl::trip_id)
-        .filter(gvb_stop_times::dsl::stop_id.eq(sid));
+        .filter(gvb_stop_times::dsl::stop_id.eq(sid))
+        .select(gvb_stop_times::dsl::trip_id);
+
     // Get all enriched rows with these trip_ids and current time
     let query = pont_trips::dsl::date
         .eq(today)

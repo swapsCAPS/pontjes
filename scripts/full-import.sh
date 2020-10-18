@@ -5,5 +5,7 @@ DATA_DIR="$DIR/../data"
 cd $DATA_DIR
 echo "Importing..."
 sqlite3 $DATA_DIR/pontjes_db ".read ../scripts/import.sql"
+echo "Denormalizing data..."
 sqlite3 $DATA_DIR/pontjes_db ".read ../scripts/init_tables.sql"
-echo "Done importing"
+ls -lah $DATA_DIR
+echo "Done! : )"
