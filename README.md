@@ -27,8 +27,11 @@ cargo run
 ```
 
 ## TODO
+- [x] Compare joins vs pre imported data performance
+- [ ] Use joins in combination with indexes
+- [ ] Add more clear back button
+- [ ] Use diesel table aliasing once it lands... sql query can be done in one go, however diesel does not support it.
 - [ ] Add favicon!
-- [ ] Compare joins vs pre imported data performance
 - [ ] Change "via" to "van" if "other" stop time is before selected stop time
 - [ ] Set up ARM cross compilation docker build
 - [ ] Add some usage metrics
