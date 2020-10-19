@@ -6,6 +6,8 @@ COPY Cargo.lock Cargo.toml /
 COPY src /src
 COPY scripts /scripts
 RUN cargo build --release
+RUN apt update
+RUN apt install -y curl unzip sqlite3
 RUN scripts/download-and-import.sh
 
 # ---
@@ -22,8 +24,9 @@ COPY templates /templates
 COPY public /public
 
 # Built in prev stage
-COPY --from=0 target/release/pontjes /
-COPY --from=0 data/pontjes_db /data/pontjes_db
+COPY --from=builder target/release/pontjes /
+COPY --from=builder data/pontjes_db /data/pontjes_db
+COPY --from=builder /usr/bin/sqlite3 /usr/bin/sqlite3
 
 EXPOSE 6376
 
