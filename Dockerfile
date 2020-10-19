@@ -1,23 +1,25 @@
-FROM rustlang/rust:nightly-buster-slim AS builder
+FROM debian:buster-20201012-slim AS builder
 
 WORKDIR /
 
+RUN echo $HOME
+RUN apt update
+RUN apt install -y curl unzip sqlite3 gcc
+RUN curl http://icanhazip.com
+
+# NOTE we need to add "-y" as an arg. while we're at it set default toolchain to nightly for rocket
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly -y
 COPY Cargo.lock Cargo.toml /
 COPY src /src
 COPY scripts /scripts
-RUN cargo build --release
-RUN apt update
-RUN apt install -y curl unzip sqlite3
+RUN $HOME/.cargo/bin/cargo build --release
 RUN scripts/download-and-import.sh
 
 # ---
 
-FROM rustlang/rust:nightly-buster-slim
+FROM debian:buster-20201012-slim
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN apt update
-RUN apt install -y curl unzip libsqlite3-dev sqlite3
 
 COPY Rocket.toml /
 COPY templates /templates
