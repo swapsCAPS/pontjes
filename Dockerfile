@@ -20,6 +20,8 @@ RUN scripts/download-and-import.sh
 FROM debian:buster-20201012-slim
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt update
+RUN apt install -y sqlite3
 
 COPY Rocket.toml /
 COPY templates /templates
@@ -28,7 +30,6 @@ COPY public /public
 # Built in prev stage
 COPY --from=builder target/release/pontjes /
 COPY --from=builder data/pontjes_db /data/pontjes_db
-COPY --from=builder /usr/bin/sqlite3 /usr/bin/sqlite3
 
 EXPOSE 6376
 
