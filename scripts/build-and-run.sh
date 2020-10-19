@@ -1,6 +1,4 @@
 #!/bin/bash
-cargo build --release
-scripts/download-and-import.sh
-docker build . -t pontjes:1
-scripts/docker-run.sh
-docker image prune -af
+TAG=latest
+docker build . -t pontjes:$TAG
+scripts/docker-run.sh $TAG
