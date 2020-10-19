@@ -32,4 +32,4 @@ COPY --from=builder /usr/bin/sqlite3 /usr/bin/sqlite3
 
 EXPOSE 6376
 
-ENTRYPOINT [ "/pontjes" ]
+CMD [ "/pontjes" ]
