@@ -1,6 +1,3 @@
-use rocket::response::{NamedFile, Responder};
-use rocket::{Request, Response};
-
 #[macro_use]
 extern crate diesel;
 

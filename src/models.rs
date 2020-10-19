@@ -23,16 +23,7 @@ pub struct Joined {
 #[derive(Serialize, Queryable, Debug)]
 pub struct Stop {
     pub stop_id: String,
-    pub stop_code: String,
     pub stop_name: String,
-    pub stop_lat: String,
-    pub stop_lon: String,
-    pub location_type: String,
-    pub parent_station: String,
-    pub stop_timezone: String,
-    pub wheelchair_boarding: String,
-    pub platform_code: String,
-    pub zone_id: String,
 }
 
 #[derive(Serialize, Queryable, Debug)]

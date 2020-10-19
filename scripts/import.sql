@@ -24,4 +24,5 @@ create index if not exists st_stop_id on stop_times (stop_id);
 
 create unique index if not exists routes_route_id on routes (route_id);
 create index if not exists routes_agency_id on routes (agency_id);
+create index if not exists routes_agency_id_route_url on routes (agency_id, route_url);
 create index if not exists routes_route_url on routes (route_url);

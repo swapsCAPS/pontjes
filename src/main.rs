@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use pontjes::schema::calendar_dates as cd;
-use pontjes::schema::gvb_stops;
+use pontjes::schema::routes;
 use pontjes::schema::stop_times as st;
 use pontjes::schema::stops;
 use pontjes::schema::trips;
@@ -44,10 +44,19 @@ struct PontjesDb(SqliteConnection);
 
 #[get("/")]
 fn index(conn: PontjesDb) -> Template {
-    match gvb_stops::table
-        .order(gvb_stops::dsl::stop_name)
-        .load::<models::Stop>(&*conn)
-    {
+    let query = routes::table
+        .inner_join(trips::table.on(trips::dsl::route_id.eq(routes::dsl::route_id)))
+        .inner_join(st::table.on(st::dsl::trip_id.eq(trips::dsl::trip_id)))
+        .inner_join(stops::table.on(stops::dsl::stop_id.eq(st::dsl::stop_id)))
+        .filter(
+            routes::dsl::agency_id
+                .eq("GVB")
+                .and(routes::dsl::route_url.like("%veerboot%")),
+        )
+        .select((stops::dsl::stop_id, stops::dsl::stop_name))
+        .distinct();
+
+    match query.load(&*conn) {
         Ok(results) => {
             let context = models::IndexCtx {
                 stops: results,
@@ -81,7 +90,13 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
             cd::table.on((cd::dsl::date.eq(&today).or(cd::dsl::date.eq(&tomorrow)))
                 .and(cd::dsl::service_id.eq(trips::dsl::service_id))),
         )
-        .filter(st::dsl::stop_id.eq(&sid))
+        .filter(
+            st::dsl::stop_id.eq(&sid).and(
+                st::dsl::departure_time
+                    .gt(&time)
+                    .or(cd::dsl::date.eq(&tomorrow)),
+            ),
+        )
         .select(st::dsl::trip_id)
         .distinct()
         .load(&*conn)
@@ -112,19 +127,16 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
             st::dsl::stop_sequence,
         ));
 
-    let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query);
-    println!("query {:?}", sql);
+    // let sql = diesel::debug_query::<diesel::sqlite::Sqlite, _>(&query);
 
     match query.load::<models::Row>(&*conn) {
         Ok(results) => {
-            println!("results {:?}", results);
             let tuples: Vec<(String, models::Row)> = results
                 .into_iter()
                 .map(|r| (format!("{}{}", r.date, r.trip_id), r))
                 .collect_vec();
 
             let group_map = tuples.into_iter().into_group_map();
-            println!("group_map {:?}", group_map);
 
             let mut list_items: Vec<models::ListItem> = group_map
                 .values()
@@ -161,7 +173,11 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
 
             list_items.truncate(32);
 
-            match gvb_stops::table.find(sid).first::<models::Stop>(&*conn) {
+            match stops::table
+                .find(sid)
+                .select((stops::dsl::stop_id, stops::dsl::stop_name))
+                .first::<models::Stop>(&*conn)
+            {
                 Ok(stop) => {
                     let context = models::DeparturesCtx {
                         title: &format!("Van {}", stop.stop_name),
