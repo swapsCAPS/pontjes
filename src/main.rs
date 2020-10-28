@@ -66,7 +66,16 @@ fn index(conn: PontjesDb) -> Template {
 }
 
 #[get("/upcoming-departures/<sid>")]
-fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
+fn upcoming_departures(conn: PontjesDb, sid: &RawStr) -> Template {
+    let now = Utc::now();
+    let amsterdam_now = now.with_timezone(&Amsterdam);
+    let today = amsterdam_now.format("%Y%m%d").to_string();
+    let tomorrow = (amsterdam_now + chrono::Duration::days(1))
+        .format("%Y%m%d")
+        .to_string();
+    let time = amsterdam_now.format("%H:%M").to_string();
+    let sid = sid.as_str();
+
     let mut stmt = conn
         .prepare(
             "
@@ -79,27 +88,72 @@ fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
         )
         .unwrap();
 
-    let stops = stmt
-        .query_map(&[&sid.as_str()], |row| models::Stop {
-            stop_id: row.get(0),
-            stop_name: row.get(1),
+    let results = stmt
+        .query_map(&[&sid], |row| models::Row {
+            date: row.get(0),
+            departure_time: row.get(1),
+            stop_name: row.get(2),
+            stop_id: row.get(3),
+            trip_id: row.get(4),
+            stop_sequence: row.get(5),
         })
         .unwrap()
         .map(|x| x.unwrap())
         .collect_vec();
 
-    let context = models::IndexCtx {
-        title: "Vertrek van:",
-        stops,
+    let tuples: Vec<(String, models::Row)> = results
+        .into_iter()
+        .map(|r| (format!("{}{}", r.date, r.trip_id), r))
+        .collect_vec();
+
+    let group_map = tuples.into_iter().into_group_map();
+
+    let list_items: Vec<models::ListItem> = group_map
+        .values()
+        // TODO The length filter is prolly too naive
+        .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
+        .map(|trip| {
+            let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
+            let last = &trip[trip.len() - 1];
+            let mut rest_stops = trip
+                .iter()
+                .filter(|x| x.stop_id != sid)
+                .map(|row| models::ListItemStop {
+                    date: &row.date,
+                    time: &row.departure_time,
+                    stop_name: &row.stop_name,
+                })
+                .collect_vec();
+
+            rest_stops.pop();
+
+            models::ListItem {
+                date: &active_stop.date,
+                time: &active_stop.departure_time,
+                rest_stops,
+                end_stop: models::ListItemStop {
+                    date: &last.date,
+                    time: &last.departure_time,
+                    stop_name: &last.stop_name,
+                },
+            }
+        })
+        .sorted_by_key(|list_item| (list_item.date, list_item.time))
+        .collect_vec();
+
+    let context = models::DeparturesCtx {
+        title: "Van:",
+        requested_stop: sid,
+        list_items,
     };
 
-    Template::render("index", &context)
+    Template::render("upcoming-departures", &context)
 }
 
 fn main() {
     rocket::ignite()
         .attach(PontjesDb::fairing())
-        .mount("/", routes![index, stop])
+        .mount("/", routes![index, upcoming_departures])
         .mount("/public", routes![cached_files])
         .attach(Template::fairing())
         .launch();
