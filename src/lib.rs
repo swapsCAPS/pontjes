@@ -1,8 +1,4 @@
-#[macro_use]
-extern crate diesel;
-
 pub mod models;
-pub mod schema;
 
 pub fn get_requested_stop(datum: &Vec<models::Row>, sid: &str) -> String {
     let optional = datum.iter().find(|x| x.stop_id == sid);

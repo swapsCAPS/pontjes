@@ -1,32 +1,12 @@
-use diesel::Queryable;
 use serde::Serialize;
 
-#[derive(Serialize, Queryable, Debug)]
-pub struct Route {
-    pub route_id: String,
-    pub route_long_name: String,
-}
-
-pub struct Joined {
-    pub route_id: String,
-    pub route_long_name: String,
-    pub route_short_name: String,
-    pub date: String,
-    pub departure_time: String,
-    pub stop_name: String,
-    pub stop_id: String,
-    pub trip_headsign: String,
-    pub trip_id: String,
-    pub stop_sequence: String,
-}
-
-#[derive(Serialize, Queryable, Debug)]
+#[derive(Serialize, Debug)]
 pub struct Stop {
     pub stop_id: String,
     pub stop_name: String,
 }
 
-#[derive(Serialize, Queryable, Debug)]
+#[derive(Serialize, Debug)]
 pub struct Row {
     pub date: String,
     pub departure_time: String,
@@ -42,16 +22,6 @@ pub struct ListItemStop<'a> {
     pub time: &'a str,
     pub stop_name: &'a str,
 }
-
-// impl<'a> From<Row> for ListItemStop<'a> {
-// fn from(row: Row) -> ListItemStop<'a> {
-// ListItemStop {
-// date: &row.date,
-// time: &row.departure_time,
-// stop_name: &row.stop_name,
-// }
-// }
-// }
 
 #[derive(Serialize)]
 pub struct ListItem<'a> {
@@ -72,4 +42,9 @@ pub struct DeparturesCtx<'a> {
     pub title: &'a str,
     pub requested_stop: &'a str,
     pub list_items: Vec<ListItem<'a>>,
+}
+
+#[derive(Serialize)]
+pub struct ErrorCtx<'a> {
+    pub msg: &'a str,
 }
