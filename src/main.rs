@@ -34,127 +34,72 @@ fn cached_files(file: PathBuf) -> Option<CachedFile> {
 #[database("pontjes_db")]
 struct PontjesDb(rusqlite::Connection);
 
-// #[get("/")]
-// fn index(conn: PontjesDb) -> Template {}
-
-#[get("/upcoming-departures/<sid>")]
-fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
-    let now = Utc::now();
-    let amsterdam_now = now.with_timezone(&Amsterdam);
-    let today = amsterdam_now.format("%Y%m%d").to_string();
-    let tomorrow = (amsterdam_now + chrono::Duration::days(1))
-        .format("%Y%m%d")
-        .to_string();
-    let time = amsterdam_now.format("%H:%M").to_string();
-    let sid = sid.as_str();
-    let bla = *&PontjesDb;
-
-    let query = conn.execute(
-        "
+#[get("/")]
+fn index(conn: PontjesDb) -> Template {
+    let mut stmt = conn
+        .prepare(
+            "
         select distinct s.stop_id, stop_name from routes as r
         inner join trips as t on t.route_id = r.route_id
         inner join stop_times as st on st.trip_id = t.trip_id
         inner join stops as s on s.stop_id = st.stop_id
         where agency_id = 'GVB' and r.route_url like '%veerboot%';
-    ",
-        &[&today, &tomorrow, &time, sid],
-    );
+        ",
+        )
+        .unwrap();
 
-    match query {
-        Ok(results) => {
-            let context = models::DeparturesCtx {
-                title: "kut",
-                requested_stop: sid,
-                list_items: results,
-            };
-            Template::render("upcoming-departures", &context)
-        }
-        Err(e) => {
-            println!("Error! {}", e);
-            let context = models::ErrorCtx { msg: "oeps" };
-            Template::render("error", context)
-        }
-    }
+    let stops = stmt
+        .query_map(&[], |row| models::Stop {
+            stop_id: row.get(0),
+            stop_name: row.get(1),
+        })
+        .unwrap()
+        .map(|x| x.unwrap())
+        .collect_vec();
 
-    // match query.load::<models::Row>(&*conn) {
-    // Ok(results) => {
-    // let tuples: Vec<(String, models::Row)> = results
-    // .into_iter()
-    // .map(|r| (format!("{}{}", r.date, r.trip_id), r))
-    // .collect_vec();
+    let context = models::IndexCtx {
+        title: "Vertrek van:",
+        stops,
+    };
 
-    // let group_map = tuples.into_iter().into_group_map();
+    Template::render("index", &context)
+}
 
-    // let mut list_items: Vec<models::ListItem> = group_map
-    // .values()
-    // // TODO The length filter is prolly too naive
-    // .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
-    // .map(|trip| {
-    // let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
-    // let last = &trip[trip.len() - 1];
-    // let mut rest_stops = trip
-    // .iter()
-    // .filter(|x| x.stop_id != sid)
-    // .map(|row| models::ListItemStop {
-    // date: &row.date,
-    // time: &row.departure_time,
-    // stop_name: &row.stop_name,
-    // })
-    // .collect_vec();
+#[get("/upcoming-departures/<sid>")]
+fn stop(conn: PontjesDb, sid: &RawStr) -> Template {
+    let mut stmt = conn
+        .prepare(
+            "
+        select distinct s.stop_id, stop_name from routes as r
+        inner join trips as t on t.route_id = r.route_id
+        inner join stop_times as st on st.trip_id = t.trip_id
+        inner join stops as s on s.stop_id = st.stop_id
+        where agency_id = 'GVB' and r.route_url like '%veerboot%';
+        ",
+        )
+        .unwrap();
 
-    // rest_stops.pop();
+    let stops = stmt
+        .query_map(&[&sid.as_str()], |row| models::Stop {
+            stop_id: row.get(0),
+            stop_name: row.get(1),
+        })
+        .unwrap()
+        .map(|x| x.unwrap())
+        .collect_vec();
 
-    // models::ListItem {
-    // date: &active_stop.date,
-    // time: &active_stop.departure_time,
-    // rest_stops,
-    // end_stop: models::ListItemStop {
-    // date: &last.date,
-    // time: &last.departure_time,
-    // stop_name: &last.stop_name,
-    // },
-    // }
-    // })
-    // .sorted_by_key(|list_item| (list_item.date, list_item.time))
-    // .collect_vec();
+    let context = models::IndexCtx {
+        title: "Vertrek van:",
+        stops,
+    };
 
-    // list_items.truncate(32);
-
-    // match stops::table
-    // .find(sid)
-    // .select((stops::dsl::stop_id, stops::dsl::stop_name))
-    // .first::<models::Stop>(&*conn)
-    // {
-    // Ok(stop) => {
-    // let context = models::DeparturesCtx {
-    // title: &format!("Van {}", stop.stop_name),
-    // requested_stop: sid,
-    // list_items,
-    // };
-    // Template::render("upcoming-departures", &context)
-    // }
-    // Err(e) => {
-    // println!("Error! {}", e);
-    // let mut context = HashMap::new();
-    // context.insert("msg", String::from("oops"));
-    // Template::render("error", context)
-    // }
-    // }
-    // }
-    // Err(e) => {
-    // println!("Error! {}", e);
-    // let mut context = HashMap::new();
-    // context.insert("msg", String::from("oops"));
-    // Template::render("error", context)
-    // }
-    // }
+    Template::render("index", &context)
 }
 
 fn main() {
     rocket::ignite()
         .attach(PontjesDb::fairing())
-        // .mount("/", routes![index, stop])
-        .mount("/", routes![stop])
+        .mount("/", routes![index, stop])
         .mount("/public", routes![cached_files])
         .attach(Template::fairing())
         .launch();
