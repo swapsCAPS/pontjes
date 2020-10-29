@@ -28,7 +28,8 @@ cargo run
 
 ## TODO
 - [x] Compare joins vs pre imported data performance
-- [ ] Use joins in combination with indexes
+- [x] Use joins in combination with indexes
+- [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
 - [ ] Add more clear back button
 - [ ] Use diesel table aliasing once it lands... sql query can be done in one go, however diesel does not support it.
 - [ ] Add favicon!

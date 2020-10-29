@@ -84,8 +84,8 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
           departure_time,
           stop_name,
           stop_sequence,
-          stop_id,
-          trip_id,
+          s.stop_id,
+          t.trip_id
         from trips as t
         inner join stop_times as st on st.trip_id=t.trip_id
         inner join stops as s on s.stop_id=st.stop_id
@@ -93,13 +93,13 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         where
           (
             (date = :today and departure_time > :time) or date = :tomorrow
-          ) and trip_id in (
-              select distinct trip_id
+          ) and t.trip_id in (
+              select distinct st.trip_id
               from stop_times as st
               where st.stop_id = :sid
             )
-        group by date, trip_id
-        order by date, departure_time
+        group by date, t.trip_id
+        order by date, departure_time;
         ",
         )
         .unwrap();
@@ -116,9 +116,9 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
                 date: row.get(0),
                 departure_time: row.get(1),
                 stop_name: row.get(2),
-                stop_id: row.get(3),
-                trip_id: row.get(4),
-                stop_sequence: row.get(5),
+                stop_sequence: row.get(3),
+                stop_id: row.get(4),
+                trip_id: row.get(5),
             },
         )
         .unwrap()
@@ -131,6 +131,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         .collect_vec();
 
     let group_map = tuples.into_iter().into_group_map();
+    println!("group_map {:?}", group_map);
 
     let list_items: Vec<models::ListItem> = group_map
         .values()
