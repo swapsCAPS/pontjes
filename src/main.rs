@@ -98,7 +98,6 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
               from stop_times as st
               where st.stop_id = :sid
             )
-        group by date, t.trip_id
         order by date, departure_time;
         ",
         )
@@ -131,9 +130,8 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         .collect_vec();
 
     let group_map = tuples.into_iter().into_group_map();
-    println!("group_map {:?}", group_map);
 
-    let list_items: Vec<models::ListItem> = group_map
+    let mut list_items: Vec<models::ListItem> = group_map
         .values()
         // TODO The length filter is prolly too naive
         .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
@@ -165,6 +163,8 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         })
         .sorted_by_key(|list_item| (list_item.date, list_item.time))
         .collect_vec();
+
+    list_items.truncate(64);
 
     let context = models::DeparturesCtx {
         title: "Van:",
