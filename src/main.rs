@@ -65,8 +65,8 @@ fn index(conn: PontjesDb) -> Template {
     Template::render("index", &context)
 }
 
-#[get("/upcoming-departures/<sid>")]
-fn upcoming_departures(conn: PontjesDb, sid: &RawStr) -> Template {
+#[get("/upcoming-departures/<raw_sid>")]
+fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
     let now = Utc::now();
     let amsterdam_now = now.with_timezone(&Amsterdam);
     let today = amsterdam_now.format("%Y%m%d").to_string();
@@ -74,29 +74,53 @@ fn upcoming_departures(conn: PontjesDb, sid: &RawStr) -> Template {
         .format("%Y%m%d")
         .to_string();
     let time = amsterdam_now.format("%H:%M").to_string();
-    let sid = sid.as_str();
+    let sid = raw_sid.as_str();
 
     let mut stmt = conn
         .prepare(
             "
-        select distinct s.stop_id, stop_name from routes as r
-        inner join trips as t on t.route_id = r.route_id
-        inner join stop_times as st on st.trip_id = t.trip_id
-        inner join stops as s on s.stop_id = st.stop_id
-        where agency_id = 'GVB' and r.route_url like '%veerboot%';
+        select
+          date,
+          departure_time,
+          stop_name,
+          stop_sequence,
+          stop_id,
+          trip_id,
+        from trips as t
+        inner join stop_times as st on st.trip_id=t.trip_id
+        inner join stops as s on s.stop_id=st.stop_id
+        inner join calendar_dates as cd on cd.service_id=t.service_id
+        where
+          (
+            (date = :today and departure_time > :time) or date = :tomorrow
+          ) and trip_id in (
+              select distinct trip_id
+              from stop_times as st
+              where st.stop_id = :sid
+            )
+        group by date, trip_id
+        order by date, departure_time
         ",
         )
         .unwrap();
 
     let results = stmt
-        .query_map(&[&sid], |row| models::Row {
-            date: row.get(0),
-            departure_time: row.get(1),
-            stop_name: row.get(2),
-            stop_id: row.get(3),
-            trip_id: row.get(4),
-            stop_sequence: row.get(5),
-        })
+        .query_map_named(
+            &[
+                (":today", &today),
+                (":tomorrow", &tomorrow),
+                (":sid", &raw_sid.to_string()),
+                (":time", &time),
+            ],
+            |row| models::Row {
+                date: row.get(0),
+                departure_time: row.get(1),
+                stop_name: row.get(2),
+                stop_id: row.get(3),
+                trip_id: row.get(4),
+                stop_sequence: row.get(5),
+            },
+        )
         .unwrap()
         .map(|x| x.unwrap())
         .collect_vec();
