@@ -40,7 +40,6 @@ pub struct IndexCtx<'a> {
 #[derive(Serialize)]
 pub struct DeparturesCtx<'a> {
     pub title: &'a str,
-    pub requested_stop: &'a str,
     pub list_items: Vec<ListItem<'a>>,
 }
 

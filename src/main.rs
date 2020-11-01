@@ -43,7 +43,8 @@ fn index(conn: PontjesDb) -> Template {
         inner join trips as t on t.route_id = r.route_id
         inner join stop_times as st on st.trip_id = t.trip_id
         inner join stops as s on s.stop_id = st.stop_id
-        where agency_id = 'GVB' and r.route_url like '%veerboot%';
+        where agency_id = 'GVB' and r.route_url like '%veerboot%'
+        order by stop_name;
         ",
         )
         .unwrap();
@@ -58,7 +59,7 @@ fn index(conn: PontjesDb) -> Template {
         .collect_vec();
 
     let context = models::IndexCtx {
-        title: "Vertrek van:",
+        title: "Vanaf",
         stops,
     };
 
@@ -74,7 +75,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         .format("%Y%m%d")
         .to_string();
     let time = amsterdam_now.format("%H:%M").to_string();
-    let sid = raw_sid.as_str();
+    let sid = raw_sid.to_string();
 
     let mut stmt = conn
         .prepare(
@@ -108,7 +109,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
             &[
                 (":today", &today),
                 (":tomorrow", &tomorrow),
-                (":sid", &raw_sid.to_string()),
+                (":sid", &sid),
                 (":time", &time),
             ],
             |row| models::Row {
@@ -166,9 +167,16 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
 
     list_items.truncate(64);
 
+    let stop_name: String = conn
+        .query_row(
+            "select stop_name from stops where stop_id = ?;",
+            &[&sid],
+            |row| row.get(0),
+        )
+        .unwrap();
+
     let context = models::DeparturesCtx {
-        title: "Van:",
-        requested_stop: sid,
+        title: &format!("Van {}", stop_name),
         list_items,
     };
 
