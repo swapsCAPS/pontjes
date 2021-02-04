@@ -4,6 +4,9 @@
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
+extern crate pretty_env_logger;
+#[macro_use]
+extern crate log;
 
 use chrono::Utc;
 use chrono_tz::Europe::Amsterdam;
@@ -69,11 +72,15 @@ fn index(conn: PontjesDb) -> Template {
 #[get("/upcoming-departures/<raw_sid>")]
 fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
     let now = Utc::now();
+    debug!("now {}", now);
     let amsterdam_now = now.with_timezone(&Amsterdam);
+    debug!("amsterdam_now {}", amsterdam_now);
     let today = amsterdam_now.format("%Y%m%d").to_string();
+    debug!("today {}", today);
     let tomorrow = (amsterdam_now + chrono::Duration::days(1))
         .format("%Y%m%d")
         .to_string();
+    debug!("tomorrow {}", tomorrow);
     let time = amsterdam_now.format("%H:%M").to_string();
     let sid = raw_sid.to_string();
 
@@ -104,6 +111,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         )
         .unwrap();
 
+    debug!("stmt {:?}", stmt);
     let results = stmt
         .query_map_named(
             &[
@@ -184,6 +192,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
 }
 
 fn main() {
+    pretty_env_logger::init();
     rocket::ignite()
         .attach(PontjesDb::fairing())
         .mount("/", routes![index, upcoming_departures])
