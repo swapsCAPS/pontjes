@@ -1,0 +1,6 @@
+server {
+  server_name pont.app www.pont.app;
+  location / {
+    proxy_pass 127.0.0.1:6376
+  }
+}
