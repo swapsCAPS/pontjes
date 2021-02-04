@@ -2,6 +2,7 @@ FROM debian:buster-20201012-slim AS builder
 
 WORKDIR /
 
+RUN echo $(date) > .build-started
 RUN echo $HOME
 RUN apt update
 RUN apt install -y curl unzip sqlite3 gcc
@@ -30,6 +31,7 @@ COPY public /public
 # Built in prev stage
 COPY --from=builder target/release/pontjes /
 COPY --from=builder data/pontjes_db /data/pontjes_db
+RUN echo $(date) > .build-finished
 
 EXPOSE 6376
 
