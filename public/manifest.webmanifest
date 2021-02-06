@@ -1,0 +1,20 @@
+{
+  "background_color": "#7cabcb",
+  "description": "Heen en Weer",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "name": "Heen en Weer",
+  "short_name": "pont.app",
+  "start_url": "/"
+}

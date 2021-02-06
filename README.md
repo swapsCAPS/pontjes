@@ -8,7 +8,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 Install deps if necessary
 ```
-sudo apt install sqlite3
+sudo apt install sqlite3 gcc
 ```
 
 Rocket needs nightly
@@ -29,6 +29,7 @@ cargo run
 ## TODO
 - [x] Compare joins vs pre imported data performance
 - [x] Use joins in combination with indexes
+- [ ] Add date of gtfs file
 - [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
 - [ ] Add more clear back button
 - [ ] Use diesel table aliasing once it lands... sql query can be done in one go, however diesel does not support it.

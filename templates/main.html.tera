@@ -3,7 +3,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <head>
     <meta charset="UTF-8">
+    <link rel="manifest" href="/public/manifest.webmanifest">
+
     <link rel="icon" href="/public/favicon.png">
+    <link rel="icon" sizes="192x192" href="/public/favicon-192.png">
+    <link rel="icon" sizes="512x512" href="/public/favicon-512.png">
+
+    <link rel="apple-touch-icon" sizes="128x128" href="/public/favicon-128.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/public/favicon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/public/favicon-167.png">
+
     <link rel="stylesheet" href="/public/stylesheets/main.css">
     <title>Heen en Weer</title>
   </head>
@@ -18,7 +28,7 @@
       <h1 class="title">{{ title }}</h1>
       {% block content %}{% endblock content %}
       <div class="footer">
-        <h4 class="sub-text">❤ Daan 2020</h4>
+        <span class="sub-text">♡ Daan 2021</span>
       </div>
     </div>
   </body>
