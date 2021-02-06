@@ -3,7 +3,7 @@ const CACHE_NAME = "offline";
 
 console.log("hai");
 
-const OFFLINE_URL = "/public/kutoffline.html";
+const OFFLINE_URL = "/public/offline.html";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
