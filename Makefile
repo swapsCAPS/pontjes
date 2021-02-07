@@ -9,10 +9,10 @@ import:
 build-app:
 	cargo build --release
 
-docker-build:
+build-docker:
 	docker build . -t pontjes:$(tag)
 
-docker-restart:
+restart:
 	docker restart pontjes
 
 run:
@@ -30,6 +30,6 @@ run:
 
 download-and-import: download import
 
-full: download-and-import docker-build run
+full: download-and-import build-docker run
 
-update-db: download-and-import docker-restart
+update-db: download-and-import restart
