@@ -192,9 +192,12 @@ fn public(file: PathBuf) -> Option<CachedFile> {
         .map(|nf| CachedFile(nf))
 }
 
-#[get("/sw-v1.js")] // NOTE service_worker needs to be hosted from root
-fn service_worker() -> Option<CachedFile> {
-    NamedFile::open(Path::new("public").join("scripts").join("sw-v1.js"))
+// NOTE Service_worker needs to be hosted from root
+// NOTE Not hard coding the path, otherwise recompile is needed when changing sw file name
+//      This does mean that everything in ./public/scripts is hosted at `/`, but we don't care.
+#[get("/<sw>")]
+fn service_worker(sw: &RawStr) -> Option<CachedFile> {
+    NamedFile::open(Path::new("public").join("scripts").join(sw.as_str()))
         .ok()
         .map(|nf| CachedFile(nf))
 }
