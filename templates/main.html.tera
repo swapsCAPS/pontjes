@@ -3,7 +3,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <head>
     <meta charset="UTF-8">
-    <link rel="manifest" href="/public/manifest.webmanifest">
+    <link rel="manifest" href="/public/manifest-v1.webmanifest">
 
     <link rel="icon" href="/public/favicon.png">
     <link rel="icon" sizes="192x192" href="/public/favicon-192.png">
@@ -16,7 +16,7 @@
 
     <link rel="stylesheet" href="/public/stylesheets/main.css">
 
-    <script src="/public/scripts/main.js"></script>
+    <script src="/public/scripts/main-v1.js"></script>
 
     <title>Heen en Weer</title>
   </head>
