@@ -8,7 +8,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 Install deps if necessary
 ```
-sudo apt install sqlite3 gcc
+sudo apt install gcc make sqlite3
 ```
 
 Rocket needs nightly
@@ -18,7 +18,7 @@ rustup override set nightly
 
 Download and initialize data
 ```
-./scripts/download-and-import.sh
+make download-and-import
 ```
 
 Blast off
