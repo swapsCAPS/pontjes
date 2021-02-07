@@ -30,6 +30,6 @@ run:
 
 download-and-import: download import
 
-full: download-and-import build-app build-docker run
+full: download-and-import build-docker run
 
 update-db: download-and-import docker-restart
