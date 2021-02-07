@@ -9,4 +9,3 @@ curl http://gtfs.ovapi.nl/nl/gtfs-nl.zip -o $DATA_DIR/gtfs/gtfs-nl.zip
 cd $DATA_DIR/gtfs
 unzip gtfs-nl.zip
 cd $DIR
-./full-import.sh
