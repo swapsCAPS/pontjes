@@ -192,9 +192,9 @@ fn public(file: PathBuf) -> Option<CachedFile> {
         .map(|nf| CachedFile(nf))
 }
 
-#[get("/sw.js")] // NOTE service_worker needs to be hosted from root
+#[get("/sw-v1.js")] // NOTE service_worker needs to be hosted from root
 fn service_worker() -> Option<CachedFile> {
-    NamedFile::open(Path::new("public").join("scripts").join("sw.js"))
+    NamedFile::open(Path::new("public").join("scripts").join("sw-v1.js"))
         .ok()
         .map(|nf| CachedFile(nf))
 }
