@@ -10,7 +10,7 @@ build-app:
 	cargo build --release
 
 build-docker:
-	docker build . -t pontjes:$(tag) --build-arg CACHEBUST=$(date +%s)
+	docker build . -t pontjes:$(tag)
 
 restart:
 	docker restart pontjes

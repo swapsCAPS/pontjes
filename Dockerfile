@@ -20,7 +20,6 @@ COPY public /public
 
 # Build app
 # NOTE if we don't build in the container we might get stupid linker errors
-ARG CACHEBUST=1
 RUN $HOME/.cargo/bin/cargo build --release
 RUN mv target/release/pontjes /
 
