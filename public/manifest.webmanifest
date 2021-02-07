@@ -1,5 +1,6 @@
 {
   "background_color": "#7cabcb",
+  "theme_color": "#345061",
   "description": "Heen en Weer",
   "display": "standalone",
   "icons": [
