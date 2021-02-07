@@ -5,8 +5,7 @@ WORKDIR /
 # Setup os
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN apt update
-RUN apt install -y sqlite3 curl gcc
+RUN apt update && apt install -y sqlite3 curl gcc
 
 # Install rust
 # NOTE we need to add "-y" as an arg. while we're at it set default toolchain to nightly for rocket
