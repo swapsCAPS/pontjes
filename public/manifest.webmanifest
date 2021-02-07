@@ -1,7 +1,7 @@
 {
   "background_color": "#7cabcb",
   "description": "Heen en Weer",
-  "display": "fullscreen",
+  "display": "minimal-ui",
   "icons": [
     {
       "src": "favicon-192.png",
