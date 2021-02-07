@@ -19,19 +19,13 @@ use std::path::{Path, PathBuf};
 use pontjes::models;
 
 struct CachedFile(NamedFile);
+
 impl<'r> rocket::response::Responder<'r> for CachedFile {
     fn respond_to(self, req: &rocket::Request) -> rocket::response::Result<'r> {
         rocket::Response::build_from(self.0.respond_to(req)?)
             .raw_header("Cache-control", "max-age=86400")
             .ok()
     }
-}
-
-#[get("/<file..>")]
-fn cached_files(file: PathBuf) -> Option<CachedFile> {
-    NamedFile::open(Path::new("public/").join(file))
-        .ok()
-        .map(|nf| CachedFile(nf))
 }
 
 #[database("pontjes_db")]
@@ -191,13 +185,28 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
     Template::render("upcoming-departures", &context)
 }
 
+#[get("/public/<file..>")]
+fn public(file: PathBuf) -> Option<CachedFile> {
+    NamedFile::open(Path::new("public/").join(file))
+        .ok()
+        .map(|nf| CachedFile(nf))
+}
+
+#[get("/sw.js")] // NOTE service_worker needs to be hosted from root
+fn service_worker() -> Option<CachedFile> {
+    NamedFile::open(Path::new("public").join("scripts").join("sw.js"))
+        .ok()
+        .map(|nf| CachedFile(nf))
+}
+
 fn main() {
     pretty_env_logger::init();
+
+    let routes = routes![index, upcoming_departures, public, service_worker];
+
     rocket::ignite()
         .attach(PontjesDb::fairing())
-        .mount("/", routes![index, upcoming_departures])
-        // TODO host sw.js at root... pfff
-        .mount("/public", routes![cached_files])
+        .mount("/", routes)
         .attach(Template::fairing())
         .launch();
 }
