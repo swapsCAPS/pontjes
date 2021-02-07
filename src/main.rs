@@ -196,6 +196,7 @@ fn main() {
     rocket::ignite()
         .attach(PontjesDb::fairing())
         .mount("/", routes![index, upcoming_departures])
+        // TODO host sw.js at root... pfff
         .mount("/public", routes![cached_files])
         .attach(Template::fairing())
         .launch();

@@ -16,5 +16,6 @@
   ],
   "name": "Heen en Weer",
   "short_name": "pont.app",
-  "start_url": "/"
+  "start_url": "/",
+  "scope": "/"
 }
