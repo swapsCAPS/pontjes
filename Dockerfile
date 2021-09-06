@@ -1,4 +1,4 @@
-FROM debian:buster-20201012-slim
+FROM debian:buster-20210902-slim
 
 WORKDIR /
 
