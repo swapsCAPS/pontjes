@@ -19,7 +19,7 @@ pub struct Row {
 #[derive(Serialize)]
 pub struct ListItemStop<'a> {
     pub date: &'a str,
-    pub time: &'a str,
+    pub time: String,
     pub stop_name: &'a str,
 }
 

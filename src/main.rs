@@ -16,7 +16,7 @@ use rocket::response::NamedFile;
 use rocket_contrib::{databases::rusqlite, templates::Template};
 use std::path::{Path, PathBuf};
 
-use pontjes::models;
+use pontjes::{models, parse_gtfs_time};
 
 struct CachedFile(NamedFile);
 
@@ -144,14 +144,20 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
             let mut rest_stops = trip
                 .iter()
                 .filter(|x| x.stop_id != sid)
-                .map(|row| models::ListItemStop {
-                    date: &row.date,
-                    time: &row.departure_time,
-                    stop_name: &row.stop_name,
+                .map(|row| {
+                    let departure_time = parse_gtfs_time(&row.departure_time);
+
+                    models::ListItemStop {
+                        date: &row.date,
+                        time: departure_time,
+                        stop_name: &row.stop_name,
+                    }
                 })
                 .collect_vec();
 
             rest_stops.pop();
+
+            let departure_time = parse_gtfs_time(&last.departure_time);
 
             models::ListItem {
                 date: &active_stop.date,
@@ -159,7 +165,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
                 rest_stops,
                 end_stop: models::ListItemStop {
                     date: &last.date,
-                    time: &last.departure_time,
+                    time: departure_time,
                     stop_name: &last.stop_name,
                 },
             }

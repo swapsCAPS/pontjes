@@ -7,3 +7,31 @@ pub fn get_requested_stop(datum: &Vec<models::Row>, sid: &str) -> String {
         None => String::from("zzz"),
     }
 }
+
+// Stupid GVB dataset contains >24:00 times (like 25:00)
+pub fn parse_gtfs_time(departure_time: &str) -> String {
+    let split: Vec<&str> = departure_time.split(':').collect();
+
+    let parsed_hours = split[0].parse::<i8>().expect(&format!(
+        "Could not parse hours from: '{}'!",
+        departure_time
+    ));
+
+    let fixed_hours = parsed_hours % 24;
+
+    format!("{:02}:{}", fixed_hours, split[1])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_parses_gtfs_time() {
+        assert_eq!("00:30", parse_gtfs_time("00:30"));
+        assert_eq!("12:30", parse_gtfs_time("12:30"));
+        assert_eq!("00:30", parse_gtfs_time("24:30"));
+        assert_eq!("03:30", parse_gtfs_time("27:30"));
+        assert_eq!("00:12", parse_gtfs_time("0:12"));
+    }
+}
