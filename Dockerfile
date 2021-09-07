@@ -22,6 +22,7 @@ COPY public /public
 # NOTE if we don't build in the container we might get stupid linker errors
 RUN $HOME/.cargo/bin/cargo build --release
 RUN mv target/release/pontjes /
+RUN rm -rf target
 
 EXPOSE 6376
 

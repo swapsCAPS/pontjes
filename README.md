@@ -36,6 +36,11 @@ Also, be careful ; )
 - [x] Add manifest
 - [x] Add service worker
 - [x] Support optional build steps
+- [x] Prevent >24 hour times
+- [ ] Fix nightly version in place
+- [ ] Fix build
+- [ ] Fix cross compilation
+- [ ] Update to rocket 5
 - [ ] Add date of gtfs file
 - [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
 - [ ] Add more clear back button
@@ -45,4 +50,4 @@ Also, be careful ; )
 - [ ] Set up ARM cross compilation docker build
 - [ ] Add some usage metrics
 - [ ] Minify css
-- [ ] Add ad
+- [ ] Add ad. Boooo!
