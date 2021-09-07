@@ -1,4 +1,4 @@
-tag:= latest
+tag:= $(shell date +%F-%H%M)
 
 download:
 	scripts/download.sh
