@@ -56,7 +56,7 @@ fn index(conn: PontjesDb) -> Template {
         .collect_vec();
 
     let context = models::IndexCtx {
-        title: "Vanaf",
+        title: String::from("Vanaf"),
         stops,
     };
 
@@ -144,33 +144,27 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
             let mut rest_stops = trip
                 .iter()
                 .filter(|x| x.stop_id != sid)
-                .map(|row| {
-                    let departure_time = parse_gtfs_time(&row.departure_time);
-
-                    models::ListItemStop {
-                        date: &row.date,
-                        time: departure_time,
-                        stop_name: &row.stop_name,
-                    }
+                .map(|row| models::ListItemStop {
+                    date: row.date.to_string(),
+                    time: parse_gtfs_time(&row.departure_time),
+                    stop_name: row.stop_name.to_string(),
                 })
                 .collect_vec();
 
             rest_stops.pop();
 
-            let departure_time = parse_gtfs_time(&last.departure_time);
-
             models::ListItem {
-                date: &active_stop.date,
-                time: &active_stop.departure_time,
+                date: active_stop.date.to_string(),
+                time: parse_gtfs_time(&active_stop.departure_time),
                 rest_stops,
                 end_stop: models::ListItemStop {
-                    date: &last.date,
-                    time: departure_time,
-                    stop_name: &last.stop_name,
+                    date: last.date.to_string(),
+                    time: parse_gtfs_time(&last.departure_time),
+                    stop_name: last.stop_name.to_string(),
                 },
             }
         })
-        .sorted_by_key(|list_item| (list_item.date, list_item.time))
+        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.time.to_owned()))
         .collect_vec();
 
     list_items.truncate(64);
@@ -184,7 +178,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         .unwrap();
 
     let context = models::DeparturesCtx {
-        title: &format!("Van {}", stop_name),
+        title: format!("Van {}", stop_name),
         list_items,
     };
 

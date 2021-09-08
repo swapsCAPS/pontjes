@@ -14,15 +14,32 @@ html, body, h1, h2, h3, h4, h5 {
   padding: 0px;
 }
 
-a {
-  text-decoration:none;
-}
-
 body {
   background: #7cabcb;
   color: #fafafa;
   font-weight: 400;
   font-family: Roboto;
+}
+
+a {
+  text-decoration:none;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #fafafa;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:active {
+  text-decoration: none;
 }
 
 .container {

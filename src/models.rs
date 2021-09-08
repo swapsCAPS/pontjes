@@ -17,33 +17,33 @@ pub struct Row {
 }
 
 #[derive(Serialize)]
-pub struct ListItemStop<'a> {
-    pub date: &'a str,
+pub struct ListItemStop {
+    pub date: String,
     pub time: String,
-    pub stop_name: &'a str,
+    pub stop_name: String,
 }
 
 #[derive(Serialize)]
-pub struct ListItem<'a> {
-    pub date: &'a str,
-    pub time: &'a str,
-    pub rest_stops: Vec<ListItemStop<'a>>,
-    pub end_stop: ListItemStop<'a>,
+pub struct ListItem {
+    pub date: String,
+    pub time: String,
+    pub rest_stops: Vec<ListItemStop>,
+    pub end_stop: ListItemStop,
 }
 
 #[derive(Serialize)]
-pub struct IndexCtx<'a> {
-    pub title: &'a str,
+pub struct IndexCtx {
+    pub title: String,
     pub stops: Vec<Stop>,
 }
 
 #[derive(Serialize)]
-pub struct DeparturesCtx<'a> {
-    pub title: &'a str,
-    pub list_items: Vec<ListItem<'a>>,
+pub struct DeparturesCtx {
+    pub title: String,
+    pub list_items: Vec<ListItem>,
 }
 
 #[derive(Serialize)]
-pub struct ErrorCtx<'a> {
-    pub msg: &'a str,
+pub struct ErrorCtx {
+    pub msg: String,
 }
