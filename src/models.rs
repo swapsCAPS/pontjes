@@ -35,6 +35,8 @@ pub struct ListItem {
 pub struct IndexCtx {
     pub title: String,
     pub stops: Vec<Stop>,
+    pub feed_info: FeedInfo,
+    pub download_date: &'static Option<String>,
 }
 
 #[derive(Serialize)]
@@ -46,4 +48,11 @@ pub struct DeparturesCtx {
 #[derive(Serialize)]
 pub struct ErrorCtx {
     pub msg: String,
+}
+
+#[derive(Serialize)]
+pub struct FeedInfo {
+    pub feed_start_date: String,
+    pub feed_end_date: String,
+    pub feed_version: String,
 }

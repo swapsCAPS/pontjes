@@ -1002,6 +1002,7 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "itertools",
+ "lazy_static",
  "libsqlite3-sys",
  "log 0.4.14",
  "pretty_env_logger",

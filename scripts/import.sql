@@ -4,11 +4,13 @@ delete from calendar_dates;
 delete from trips;
 delete from stop_times;
 delete from routes;
+delete from feed_info;
 .import gtfs/stops.txt stops
 .import gtfs/calendar_dates.txt calendar_dates
 .import gtfs/trips.txt trips
 .import gtfs/stop_times.txt stop_times
 .import gtfs/routes.txt routes
+.import gtfs/feed_info.txt feed_info
 
 create unique index if not exists stops_stop_id on stops (stop_id);
 

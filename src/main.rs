@@ -7,6 +7,8 @@ extern crate rocket_contrib;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate lazy_static;
 
 use chrono::Utc;
 use chrono_tz::Europe::Amsterdam;
@@ -14,6 +16,7 @@ use itertools::Itertools;
 use rocket::http::RawStr;
 use rocket::response::NamedFile;
 use rocket_contrib::{databases::rusqlite, templates::Template};
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use pontjes::{models, parse_gtfs_time};
@@ -26,6 +29,10 @@ impl<'r> rocket::response::Responder<'r> for CachedFile {
             .raw_header("Cache-control", "max-age=86400")
             .ok()
     }
+}
+
+lazy_static! {
+    static ref DOWNLOAD_DATE: Option<String> = fs::read_to_string("/data/download_date").ok();
 }
 
 #[database("pontjes_db")]
@@ -55,9 +62,24 @@ fn index(conn: PontjesDb) -> Template {
         .map(|x| x.unwrap())
         .collect_vec();
 
+    let feed_info = conn
+        .prepare("select * from feed_info limit 1;")
+        .unwrap()
+        .query_map(&[], |row| models::FeedInfo {
+            feed_start_date: row.get(4),
+            feed_end_date: row.get(5),
+            feed_version: row.get(6),
+        })
+        .unwrap()
+        .nth(0)
+        .expect("Did not get feed info!")
+        .unwrap();
+
     let context = models::IndexCtx {
         title: String::from("Vanaf"),
         stops,
+        feed_info,
+        download_date: &DOWNLOAD_DATE,
     };
 
     Template::render("index", &context)

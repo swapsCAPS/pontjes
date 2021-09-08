@@ -11,4 +11,5 @@
   </div>
   {% endfor %}
 </div>
+<span>{{ feed_info.feed_start_date }} {{ feed_info.feed_end_date }} {{ download_date }}</span>
 {% endblock content %}
