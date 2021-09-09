@@ -62,7 +62,7 @@ fn index(conn: PontjesDb) -> Template {
     let context = models::MainCtx {
         title: String::from("Vanaf"),
         feed_info,
-        download_date: &DOWNLOAD_DATE,
+        download_date: fs::read_to_string("/data/download_date").ok(),
         content: models::Content::IndexCtx { stops },
     };
 
@@ -189,7 +189,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         content: models::Content::DeparturesCtx { list_items },
         title: format!("Van {}", stop_name),
         feed_info,
-        download_date: &DOWNLOAD_DATE,
+        download_date: fs::read_to_string("/data/download_date").ok(),
     };
 
     Template::render("upcoming-departures", &context)

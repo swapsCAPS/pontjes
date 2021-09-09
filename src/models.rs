@@ -41,7 +41,7 @@ pub enum Content {
 pub struct MainCtx {
     pub feed_info: FeedInfo,
     pub title: String,
-    pub download_date: &'static Option<String>,
+    pub download_date: Option<String>,
     pub content: Content,
 }
 
