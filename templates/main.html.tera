@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/public/favicon-167.png">
 
-    <link rel="stylesheet" href="/public/stylesheets/main.css">
+    <link rel="stylesheet" href="/public/stylesheets/main-v1.css">
 
     <script src="/public/scripts/main-v1.js"></script>
 
@@ -32,6 +32,7 @@
       {% block content %}{% endblock content %}
       <div class="footer">
         <a class="sub-text" href="https://daans.page">♡ Daan 2021</a>
+        <a class="sub-sub-text" href="http://gtfs.ovapi.nl">geïmporteerd: {{ download_date }}, geldig: {{ feed_info.feed_start_date }} - {{ feed_info.feed_end_date }}</a>
       </div>
     </div>
   </body>

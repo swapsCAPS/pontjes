@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="content row wrap pad-w-6 mar-t-16">
-  {% for s in stops %}
+  {% for s in content.IndexCtx.stops %}
   <div class="list-item from-stop">
       <div class="list-item-node">
         <h4>{{ s.stop_name }}</h4>
@@ -11,5 +11,4 @@
   </div>
   {% endfor %}
 </div>
-<span>{{ feed_info.feed_start_date }} {{ feed_info.feed_end_date }} {{ download_date }}</span>
 {% endblock content %}

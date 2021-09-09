@@ -98,13 +98,23 @@ a:active {
 
 .footer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  color: #fafafa;
 }
 
 .footer .sub-text {
   margin: 22px;
+  text-align: center;
   font-weight: 100;
-  font-size: 11px;
+  font-size: 12px;
+}
+
+.footer .sub-sub-text {
+  margin: 42px 0 12px;
+  text-align: center;
+  font-weight: 100;
+  font-size: 9px;
 }
 
 .pad-w-6 {

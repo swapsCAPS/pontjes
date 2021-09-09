@@ -2,7 +2,7 @@
 {% block content %}
 <div class="content column">
   <div class="list">
-    {% for list_item in list_items %}
+    {% for list_item in content.DeparturesCtx.list_items %}
     <div class="list-item">
       <div class="list-item-content">
         <h1>{{ list_item.time }}</h1>

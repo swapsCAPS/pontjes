@@ -39,10 +39,11 @@ Also, be careful ; )
 - [x] Prevent >24 hour times
 - [x] Fix build
 - [x] Add favicon!
+- [ ] Put feed info in static
 - [ ] Fix nightly version in place
 - [ ] Fix cross compilation
 - [ ] Update to rocket 5
-- [ ] Add date of gtfs file
+- [x] Add date of gtfs file
 - [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
 - [ ] Add more clear back button
 - [ ] Use diesel table aliasing once it lands... sql query can be done in one go, however diesel does not support it.

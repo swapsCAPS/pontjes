@@ -32,17 +32,17 @@ pub struct ListItem {
 }
 
 #[derive(Serialize)]
-pub struct IndexCtx {
-    pub title: String,
-    pub stops: Vec<Stop>,
-    pub feed_info: FeedInfo,
-    pub download_date: &'static Option<String>,
+pub enum Content {
+    IndexCtx { stops: Vec<Stop> },
+    DeparturesCtx { list_items: Vec<ListItem> },
 }
 
 #[derive(Serialize)]
-pub struct DeparturesCtx {
+pub struct MainCtx {
+    pub feed_info: FeedInfo,
     pub title: String,
-    pub list_items: Vec<ListItem>,
+    pub download_date: &'static Option<String>,
+    pub content: Content,
 }
 
 #[derive(Serialize)]

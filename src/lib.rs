@@ -1,4 +1,10 @@
+#[macro_use]
+extern crate rocket_contrib;
 pub mod models;
+use rocket_contrib::databases::rusqlite;
+
+#[database("pontjes_db")]
+pub struct PontjesDb(rusqlite::Connection);
 
 pub fn get_requested_stop(datum: &Vec<models::Row>, sid: &str) -> String {
     let optional = datum.iter().find(|x| x.stop_id == sid);
@@ -20,6 +26,20 @@ pub fn parse_gtfs_time(departure_time: &str) -> String {
     let fixed_hours = parsed_hours % 24;
 
     format!("{:02}:{}", fixed_hours, split[1])
+}
+
+pub fn get_feed_info(conn: &PontjesDb) -> models::FeedInfo {
+    conn.prepare("select * from feed_info limit 1;")
+        .unwrap()
+        .query_map(&[], |row| models::FeedInfo {
+            feed_start_date: row.get(4),
+            feed_end_date: row.get(5),
+            feed_version: row.get(6),
+        })
+        .unwrap()
+        .nth(0)
+        .expect("Did not get feed info!")
+        .unwrap()
 }
 
 #[cfg(test)]

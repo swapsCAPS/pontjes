@@ -2,8 +2,6 @@
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
-extern crate rocket_contrib;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
@@ -15,11 +13,11 @@ use chrono_tz::Europe::Amsterdam;
 use itertools::Itertools;
 use rocket::http::RawStr;
 use rocket::response::NamedFile;
-use rocket_contrib::{databases::rusqlite, templates::Template};
+use rocket_contrib::templates::Template;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use pontjes::{models, parse_gtfs_time};
+use pontjes::{get_feed_info, models, parse_gtfs_time, PontjesDb};
 
 struct CachedFile(NamedFile);
 
@@ -34,9 +32,6 @@ impl<'r> rocket::response::Responder<'r> for CachedFile {
 lazy_static! {
     static ref DOWNLOAD_DATE: Option<String> = fs::read_to_string("/data/download_date").ok();
 }
-
-#[database("pontjes_db")]
-struct PontjesDb(rusqlite::Connection);
 
 #[get("/")]
 fn index(conn: PontjesDb) -> Template {
@@ -62,24 +57,13 @@ fn index(conn: PontjesDb) -> Template {
         .map(|x| x.unwrap())
         .collect_vec();
 
-    let feed_info = conn
-        .prepare("select * from feed_info limit 1;")
-        .unwrap()
-        .query_map(&[], |row| models::FeedInfo {
-            feed_start_date: row.get(4),
-            feed_end_date: row.get(5),
-            feed_version: row.get(6),
-        })
-        .unwrap()
-        .nth(0)
-        .expect("Did not get feed info!")
-        .unwrap();
+    let feed_info = get_feed_info(&conn);
 
-    let context = models::IndexCtx {
+    let context = models::MainCtx {
         title: String::from("Vanaf"),
-        stops,
         feed_info,
         download_date: &DOWNLOAD_DATE,
+        content: models::Content::IndexCtx { stops },
     };
 
     Template::render("index", &context)
@@ -199,9 +183,13 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         )
         .unwrap();
 
-    let context = models::DeparturesCtx {
+    let feed_info = get_feed_info(&conn);
+
+    let context = models::MainCtx {
+        content: models::Content::DeparturesCtx { list_items },
         title: format!("Van {}", stop_name),
-        list_items,
+        feed_info,
+        download_date: &DOWNLOAD_DATE,
     };
 
     Template::render("upcoming-departures", &context)
