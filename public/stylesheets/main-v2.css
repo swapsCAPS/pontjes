@@ -23,10 +23,12 @@ body {
 
 a {
   text-decoration:none;
+  color: #fafafa;
 }
 
 a:link {
   text-decoration: none;
+  color: #fafafa;
 }
 
 a:visited {
@@ -36,10 +38,12 @@ a:visited {
 
 a:hover {
   text-decoration: none;
+  color: #fafafa;
 }
 
 a:active {
   text-decoration: none;
+  color: #fafafa;
 }
 
 .container {
