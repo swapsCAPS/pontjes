@@ -20,6 +20,7 @@ pub struct Row {
 pub struct ListItemStop {
     pub date: String,
     pub time: String,
+    pub raw_time: String,
     pub stop_name: String,
 }
 
@@ -27,6 +28,7 @@ pub struct ListItemStop {
 pub struct ListItem {
     pub date: String,
     pub time: String,
+    pub raw_time: String,
     pub rest_stops: Vec<ListItemStop>,
     pub end_stop: ListItemStop,
 }

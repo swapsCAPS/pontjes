@@ -152,6 +152,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
                 .filter(|x| x.stop_id != sid)
                 .map(|row| models::ListItemStop {
                     date: row.date.to_string(),
+                    raw_time: row.departure_time.to_string(),
                     time: parse_gtfs_time(&row.departure_time),
                     stop_name: row.stop_name.to_string(),
                 })
@@ -161,16 +162,18 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
 
             models::ListItem {
                 date: active_stop.date.to_string(),
+                raw_time: active_stop.departure_time.to_string(),
                 time: parse_gtfs_time(&active_stop.departure_time),
                 rest_stops,
                 end_stop: models::ListItemStop {
                     date: last.date.to_string(),
+                    raw_time: active_stop.departure_time.to_string(),
                     time: parse_gtfs_time(&last.departure_time),
                     stop_name: last.stop_name.to_string(),
                 },
             }
         })
-        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.time.to_owned()))
+        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.raw_time.to_owned()))
         .collect_vec();
 
     list_items.truncate(64);
