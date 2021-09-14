@@ -42,7 +42,7 @@ a, a:link, a:hover, a:focus, a:active {
 .content {
   display: flex;
   justify-content: center;
-  margin: 0px 6px 96px 6px;
+  margin: 0px 6px 64px 6px;
 }
 
 .row {
