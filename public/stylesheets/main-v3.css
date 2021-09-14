@@ -9,6 +9,11 @@
   font-weight: bold;
 }
 
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url(/public/fonts/SourceCodePro-Medium.ttf);
+}
+
 html, body, h1, h2, h3, h4, h5 {
   margin: 0px;
   padding: 0px;
@@ -21,36 +26,15 @@ body {
   font-family: Roboto;
 }
 
-a {
+a, a:link, a:hover, a:focus, a:active {
   text-decoration:none;
-  color: #fafafa;
-}
-
-a:link {
-  text-decoration: none;
-  color: #fafafa;
-}
-
-a:visited {
-  text-decoration: none;
-  color: #fafafa;
-}
-
-a:hover {
-  text-decoration: none;
-  color: #fafafa;
-}
-
-a:active {
-  text-decoration: none;
-  color: #fafafa;
+  color: inherit;
 }
 
 .container {
   display: flex;
   position: relative;
   flex-direction: column;
-  max-width: 768px;
   margin: auto;
   max-width: 500px;
 }
@@ -58,7 +42,7 @@ a:active {
 .content {
   display: flex;
   justify-content: center;
-  margin-bottom: 32px;
+  margin: 0px 6px 96px 6px;
 }
 
 .row {
@@ -101,29 +85,11 @@ a:active {
 }
 
 .footer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: #fafafa;
-}
-
-.footer .sub-text {
-  margin: 22px;
-  text-align: center;
-  font-weight: 100;
-  font-size: 12px;
-}
-
-.footer .sub-sub-text {
-  margin: 42px 0 12px;
-  text-align: center;
-  font-weight: 100;
-  font-size: 9px;
-}
-
-.pad-w-6 {
-  padding-left: 6px;
-  padding-right: 6px;
+  color: #fafafaba;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 10px;
+  text-align: right;
+  margin: 0 12px 12px 0;
 }
 
 .list-item {
