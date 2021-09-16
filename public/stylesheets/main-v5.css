@@ -59,6 +59,7 @@ a, a:link, a:hover, a:focus, a:active {
 
 .header {
   display: flex;
+  margin-top: 12px;
   justify-content: center;
 }
 
