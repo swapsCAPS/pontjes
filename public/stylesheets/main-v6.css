@@ -97,7 +97,7 @@ a, a:link, a:hover, a:focus, a:active {
   position: relative;
   background-color: #fafafa;
   color: #333;
-  margin: 0 12px 12px 12px;
+  margin: 0 6px 12px 6px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   border-radius: 4px;
   overflow-x: auto;
