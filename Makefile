@@ -9,6 +9,10 @@ import:
 build-app:
 	cargo build --release
 
+build-pi:
+	cross build --target aarch64-unknown-linux-gnu --release
+	cp target/aarch64-unknown-linux-gnu/release/pontjes bin/pontjes_aarch64-unknown-linux-gnu
+
 build-docker:
 	docker build . -t pontjes:$(tag)
 
