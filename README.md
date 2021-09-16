@@ -9,6 +9,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Install deps if necessary
 ```
 sudo apt install gcc make sqlite3 unzip
+cargo install cross
 ```
 
 Rocket needs nightly
@@ -39,9 +40,9 @@ Also, be careful ; )
 - [x] Prevent >24 hour times
 - [x] Fix build
 - [x] Add favicon!
-- [ ] Put feed info in static
+- [x] Put feed info in static
 - [ ] Fix nightly version in place
-- [ ] Fix cross compilation
+- [x] Fix cross compilation
 - [ ] Update to rocket 5
 - [x] Add date of gtfs file
 - [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
