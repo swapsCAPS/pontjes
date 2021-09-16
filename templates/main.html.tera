@@ -2,7 +2,10 @@
 <html lang="en">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <head>
+    <title>{{ page_title }}</title>
+
     <meta charset="UTF-8">
+    <meta name="description" content="pont.app - Een appie voor de Amsterdamse GVB pont dienstregeling, elke dag vers geïmporteerd, dus zo snel mogelijk up to date.">
     <link rel="manifest" href="/public/manifest-v1.webmanifest">
 
     <link rel="icon" href="/public/favicon.png">
@@ -17,8 +20,6 @@
     <link rel="stylesheet" href="/public/stylesheets/main-v4.css">
 
     <script src="/public/scripts/main-v1.js"></script>
-
-    <title>Heen en Weer</title>
   </head>
   <body>
     <div class="container">

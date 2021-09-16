@@ -60,6 +60,7 @@ fn index(conn: PontjesDb) -> Template {
     let feed_info = get_feed_info(&conn);
 
     let context = models::MainCtx {
+        page_title: "pont.app",
         title: String::from("Vanaf"),
         feed_info,
         download_date: fs::read_to_string("/data/download_date").ok(),
@@ -189,8 +190,9 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
     let feed_info = get_feed_info(&conn);
 
     let context = models::MainCtx {
+        page_title: &format!("pont.app - {}", &stop_name),
         content: models::Content::DeparturesCtx { list_items },
-        title: format!("Van {}", stop_name),
+        title: format!("Vanaf {}", stop_name),
         feed_info,
         download_date: fs::read_to_string("/data/download_date").ok(),
     };

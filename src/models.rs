@@ -40,7 +40,8 @@ pub enum Content {
 }
 
 #[derive(Serialize)]
-pub struct MainCtx {
+pub struct MainCtx<'a> {
+    pub page_title: &'a str,
     pub feed_info: FeedInfo,
     pub title: String,
     pub download_date: Option<String>,
