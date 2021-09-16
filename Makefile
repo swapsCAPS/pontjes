@@ -14,7 +14,7 @@ build-pi:
 	cp target/aarch64-unknown-linux-gnu/release/pontjes bin/pontjes_aarch64-unknown-linux-gnu
 
 build-docker:
-	docker build . -t pontjes:$(tag)
+	docker build . -t pontjes:$(tag) -t pontjes:latest
 
 restart:
 	docker restart pontjes
@@ -30,7 +30,7 @@ run:
 		-v $(PWD)/public:/public \
 		--name pontjes \
 		--restart always \
-		pontjes:$(tag)
+		pontjes:latest
 
 download-and-import: download import
 
