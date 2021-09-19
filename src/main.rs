@@ -8,7 +8,7 @@ extern crate log;
 #[macro_use]
 extern crate lazy_static;
 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use chrono_tz::Europe::Amsterdam;
 use itertools::Itertools;
 use rocket::http::RawStr;
@@ -17,7 +17,11 @@ use rocket_contrib::templates::Template;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use pontjes::{get_feed_info, models, parse_gtfs_time, PontjesDb};
+use pontjes::{
+    get_feed_info,
+    models::{Content, ListItem, ListItemStop, MainCtx, Row, Stop},
+    PontjesDb,
+};
 
 struct CachedFile(NamedFile);
 
@@ -49,7 +53,7 @@ fn index(conn: PontjesDb) -> Template {
         .unwrap();
 
     let stops = stmt
-        .query_map(&[], |row| models::Stop {
+        .query_map(&[], |row| Stop {
             stop_id: row.get(0),
             stop_name: row.get(1),
         })
@@ -59,12 +63,12 @@ fn index(conn: PontjesDb) -> Template {
 
     let feed_info = get_feed_info(&conn);
 
-    let context = models::MainCtx {
+    let context = MainCtx {
         page_title: "pont.app",
         title: String::from("Vanaf"),
         feed_info,
         download_date: fs::read_to_string("/data/download_date").ok(),
-        content: models::Content::IndexCtx { stops },
+        content: Content::IndexCtx { stops },
     };
 
     Template::render("index", &context)
@@ -72,7 +76,7 @@ fn index(conn: PontjesDb) -> Template {
 
 #[get("/upcoming-departures/<raw_sid>")]
 fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
-    let now = DateTime::parse_from_str("2021-09-18 23:00 +0200", "%Y-%m-%d %H:%M %z").unwrap();
+    let now = Utc::now();
     debug!("now {}", now);
     let amsterdam_now = now.with_timezone(&Amsterdam);
     debug!("amsterdam_now {}", amsterdam_now);
@@ -121,7 +125,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
                 (":sid", &sid),
                 (":time", &time),
             ],
-            |row| models::Row {
+            |row| Row {
                 date: row.get(0),
                 departure_time: row.get(1),
                 stop_name: row.get(2),
@@ -134,47 +138,46 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
         .map(|x| x.unwrap())
         .collect_vec();
 
-    let tuples: Vec<(String, models::Row)> = results
+    let tuples: Vec<(String, Row)> = results
         .into_iter()
         .map(|r| (format!("{}{}", r.date, r.trip_id), r))
         .collect_vec();
 
     let group_map = tuples.into_iter().into_group_map();
 
-    let mut list_items: Vec<models::ListItem> = group_map
+    let mut list_items: Vec<ListItem> = group_map
         .values()
         // TODO The length filter is prolly too naive
         .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
         .map(|trip| {
-            let active_stop = trip.iter().find(|x| x.stop_id == sid).unwrap();
-            let last = &trip[trip.len() - 1];
-            let mut rest_stops = trip
+            let active_stop: &Row = trip.iter().find(|x| x.stop_id == sid).unwrap();
+            let last: &Row = &trip[trip.len() - 1];
+
+            let start_stop = ListItemStop::from(&active_stop);
+            let end_stop = ListItemStop::from(&last);
+
+            let mut rest_stops: Vec<ListItemStop> = trip
                 .iter()
-                .filter(|x| x.stop_id != sid)
-                .map(|row| models::ListItemStop {
-                    date: row.date.to_string(),
-                    raw_time: row.departure_time.to_string(),
-                    time: parse_gtfs_time(&row.departure_time),
-                    stop_name: row.stop_name.to_string(),
+                .map(|row| ListItemStop::from(row))
+                .filter(|lis| {
+                    lis.stop_name != active_stop.stop_name && lis.date_time > start_stop.date_time
                 })
                 .collect_vec();
 
             rest_stops.pop();
 
-            models::ListItem {
-                date: active_stop.date.to_string(),
-                raw_time: active_stop.departure_time.to_string(),
-                time: parse_gtfs_time(&active_stop.departure_time),
+            ListItem {
+                start_stop,
                 rest_stops,
-                end_stop: models::ListItemStop {
-                    date: last.date.to_string(),
-                    raw_time: active_stop.departure_time.to_string(),
-                    time: parse_gtfs_time(&last.departure_time),
-                    stop_name: last.stop_name.to_string(),
-                },
+                end_stop,
             }
         })
-        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.time.to_owned()))
+        .sorted_by_key(|list_item| {
+            (
+                list_item.start_stop.date.to_owned(),
+                list_item.start_stop.time.to_owned(),
+            )
+        })
         .collect_vec();
 
     list_items.truncate(64);
@@ -189,9 +192,9 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
 
     let feed_info = get_feed_info(&conn);
 
-    let context = models::MainCtx {
+    let context = MainCtx {
         page_title: &format!("pont.app - {}", &stop_name),
-        content: models::Content::DeparturesCtx { list_items },
+        content: Content::DeparturesCtx { list_items },
         title: format!("Vanaf {}", stop_name),
         feed_info,
         download_date: fs::read_to_string("/data/download_date").ok(),

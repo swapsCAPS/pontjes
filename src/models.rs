@@ -1,3 +1,4 @@
+use crate::gtfs_to_sane_date;
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
@@ -20,15 +21,36 @@ pub struct Row {
 pub struct ListItemStop {
     pub date: String,
     pub time: String,
-    pub raw_time: String,
+    pub date_time: String,
     pub stop_name: String,
+}
+
+// TODO implement std::cmp::Ordering
+impl ListItemStop {
+    pub fn new(date: &str, time: &str, stop_name: &str) -> ListItemStop {
+        let (date, time) = gtfs_to_sane_date(&date, &time);
+        ListItemStop {
+            date: date.to_owned(),
+            time: time.to_owned(),
+            date_time: format!("{}{}", &date, &time),
+            stop_name: stop_name.to_owned(),
+        }
+    }
+
+    pub fn from(row: &Row) -> ListItemStop {
+        let (date, time) = gtfs_to_sane_date(&row.date, &row.departure_time);
+        ListItemStop {
+            date: date.to_owned(),
+            time: time.to_owned(),
+            date_time: format!("{}{}", &date, &time),
+            stop_name: row.stop_name.to_owned(),
+        }
+    }
 }
 
 #[derive(Serialize)]
 pub struct ListItem {
-    pub date: String,
-    pub time: String,
-    pub raw_time: String,
+    pub start_stop: ListItemStop,
     pub rest_stops: Vec<ListItemStop>,
     pub end_stop: ListItemStop,
 }
