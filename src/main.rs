@@ -8,7 +8,7 @@ extern crate log;
 #[macro_use]
 extern crate lazy_static;
 
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use chrono_tz::Europe::Amsterdam;
 use itertools::Itertools;
 use rocket::http::RawStr;
@@ -72,7 +72,7 @@ fn index(conn: PontjesDb) -> Template {
 
 #[get("/upcoming-departures/<raw_sid>")]
 fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
-    let now = Utc::now();
+    let now = DateTime::parse_from_str("2021-09-18 23:00 +0200", "%Y-%m-%d %H:%M %z").unwrap();
     debug!("now {}", now);
     let amsterdam_now = now.with_timezone(&Amsterdam);
     debug!("amsterdam_now {}", amsterdam_now);
@@ -174,7 +174,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
                 },
             }
         })
-        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.raw_time.to_owned()))
+        .sorted_by_key(|list_item| (list_item.date.to_owned(), list_item.time.to_owned()))
         .collect_vec();
 
     list_items.truncate(64);
