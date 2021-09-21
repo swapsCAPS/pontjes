@@ -1,6 +1,7 @@
 {% extends "main" %}
 
 {% block content %}
+<h1 class="title">{{ title }}</h1>
 <div class="content row wrap">
   {% for s in content.IndexCtx.stops %}
   <div class="list-item from-stop">

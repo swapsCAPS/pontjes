@@ -65,6 +65,7 @@ fn index(conn: PontjesDb) -> Template {
 
     let context = MainCtx {
         page_title: "pont.app",
+        page_description: "Je appie voor de Amsterdamse pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.",
         title: String::from("Vanaf"),
         feed_info,
         download_date: fs::read_to_string("/data/download_date").ok(),
@@ -194,6 +195,7 @@ fn upcoming_departures(conn: PontjesDb, raw_sid: &RawStr) -> Template {
 
     let context = MainCtx {
         page_title: &format!("pont.app - {}", &stop_name),
+        page_description: &format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
         content: Content::DeparturesCtx { list_items },
         title: format!("Vanaf {}", stop_name),
         feed_info,

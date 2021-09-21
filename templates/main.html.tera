@@ -5,7 +5,7 @@
     <title>{{ page_title }}</title>
 
     <meta charset="UTF-8">
-    <meta name="description" content="pont.app - Een appie voor de Amsterdamse GVB pont dienstregeling, elke dag vers geïmporteerd, dus zo snel mogelijk up to date.">
+    <meta name="description" content="pont.app - {{ page_description }}">
     <link rel="manifest" href="/public/manifest-v1.webmanifest">
 
     <link rel="icon" href="/public/favicon.png">
@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/public/favicon-167.png">
 
-    <link rel="stylesheet" href="/public/stylesheets/main-v7.css">
+    <link rel="stylesheet" href="/public/stylesheets/main-v8.css">
 
     <script src="/public/scripts/main-v1.js"></script>
   </head>
@@ -29,7 +29,6 @@
           <a href="/"></a>
         </div>
       </div>
-      <h1 class="title">{{ title }}</h1>
       {% block content %}{% endblock content %}
       <div class="footer">
         <a href="https://daans.page">built by daan</a><br>
