@@ -5,10 +5,9 @@
 <div class="content row wrap">
   {% for s in content.IndexCtx.stops %}
   <div class="list-item from-stop">
-      <div class="list-item-node">
-        <h4>{{ s.stop_name }}</h4>
-      </div>
-      <a href="/upcoming-departures/{{s.stop_id}}"></a>
+    <a class="list-item-node" href="/upcoming-departures/{{s.stop_id}}">
+      <h4>{{ s.stop_name }}</h4>
+    </a>
   </div>
   {% endfor %}
 </div>

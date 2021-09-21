@@ -24,10 +24,9 @@
   <body>
     <div class="container">
       <div class="header">
-        <div class="home">
+        <a class="home" href="/">
           <h1>🚣</h1>
-          <a href="/"></a>
-        </div>
+        </a>
       </div>
       {% block content %}{% endblock content %}
       <div class="footer">

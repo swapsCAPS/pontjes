@@ -169,7 +169,6 @@ a, a:link, a:hover, a:focus, a:active {
 }
 
 .list-item-node {
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -177,13 +176,3 @@ a, a:link, a:hover, a:focus, a:active {
   min-height: 64px;
   min-width: 148px;
 }
-
-.list-item a {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-}
-
