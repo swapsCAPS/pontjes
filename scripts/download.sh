@@ -5,7 +5,7 @@ DATA_DIR="$DIR/../data"
 echo $DATA_DIR
 mkdir -p $DATA_DIR/gtfs
 rm -rf $DATA_DIR/gtfs/*
-curl http://gtfs.ovapi.nl/nl/gtfs-nl.zip -o $DATA_DIR/gtfs/gtfs-nl.zip
+curl http://gtfs.ovapi.nl/nl/gtfs-nl.zip -o $DATA_DIR/gtfs/gtfs-nl.zip || exit 1
 cd $DATA_DIR/gtfs
-unzip gtfs-nl.zip
+unzip gtfs-nl.zip || exit 1
 cd $DIR
