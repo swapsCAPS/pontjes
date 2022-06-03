@@ -2,14 +2,14 @@
 delete from trips where trip_id not in (
   select distinct t.trip_id from trips as t
   inner join routes as r on r.route_id = t.route_id
-  where agency_id = 'GVB' and r.route_url like '%veerboot%'
+  where r.agency_id = 'GVB' and r.route_type = 4
 );
 
 delete from stops where stop_id not in (
   select distinct st.stop_id from stop_times as st
   inner join trips  as t on t.trip_id  = st.trip_id
   inner join routes as r on r.route_id = t.route_id
-  where agency_id = 'GVB' and r.route_url like '%veerboot%'
+  where r.agency_id = 'GVB' and r.route_type = 4
 );
 
 delete from stop_times where stop_id not in (
@@ -35,7 +35,7 @@ where stop_id in (
   inner join stops      as s  on s.stop_id  = st.stop_id
   where agency_id   = 'GVB'              and
         s.stop_name = "Centraal Station" and
-        r.route_url like '%veerboot%'
+        r.route_type = 4
 );
 
 --- Then remove all CS stops and create a new single entry
