@@ -11,27 +11,16 @@ use chrono_tz::Europe::Amsterdam;
 use itertools::Itertools;
 use rocket::fs::NamedFile;
 use rocket_dyn_templates::Template;
-
+use rocket_sync_db_pools::rusqlite::params;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use rocket_sync_db_pools::rusqlite::params;
+pub mod models;
+pub mod queries;
+pub mod utils;
 
-use pontjes::{
-    get_feed_info,
-    models::{Content, ListItem, ListItemStop, MainCtx, Row, Stop},
-    PontjesDb,
-};
-
-// struct CachedFile(NamedFile);
-
-// impl<'r> rocket::response::Responder<'r> for CachedFile {
-// fn respond_to(self, req: &rocket::Request) -> rocket::response::Result<'r> {
-// rocket::Response::build_from(self.0.respond_to(req)?)
-// .raw_header("Cache-control", "max-age=86400")
-// .ok()
-// }
-// }
+use models::{Content, ListItem, ListItemStop, MainCtx, Row, Stop};
+use utils::{get_feed_info, PontjesDb};
 
 lazy_static! {
     static ref DOWNLOAD_DATE: Option<String> = fs::read_to_string("/data/download_date").ok();
@@ -41,16 +30,7 @@ lazy_static! {
 async fn index(db: PontjesDb) -> Template {
     let context = db.run(|conn| {
         let mut stmt = conn
-            .prepare(
-                "
-        select distinct s.stop_id, stop_name from routes as r
-        inner join trips as t on t.route_id = r.route_id
-        inner join stop_times as st on st.trip_id = t.trip_id
-        inner join stops as s on s.stop_id = st.stop_id
-        where agency_id = 'GVB' and r.route_type = 4
-        order by stop_name;
-        ",
-            )
+            .prepare(queries::INDEX)
             .unwrap();
 
         let stops = stmt
@@ -74,60 +54,31 @@ async fn index(db: PontjesDb) -> Template {
         }
     }).await;
 
-    Template::render("index", &context)
+    Template::render("index", context)
 }
 
 #[get("/upcoming-departures/<raw_sid>")]
 async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
     let sid = raw_sid.to_string();
     let context = db.run(move |conn| {
-    let now = Utc::now();
-    debug!("now {}", now);
-    let amsterdam_now = now.with_timezone(&Amsterdam);
-    debug!("amsterdam_now {}", amsterdam_now);
-    let today = amsterdam_now.format("%Y%m%d").to_string();
-    debug!("today {}", today);
-    let tomorrow = (amsterdam_now + chrono::Duration::days(1))
-        .format("%Y%m%d")
-        .to_string();
-    debug!("tomorrow {}", tomorrow);
-    let time = amsterdam_now.format("%H:%M").to_string();
-        let mut stmt = conn
-            .prepare(
-                "
-        select
-          date,
-          departure_time,
-          stop_name,
-          stop_sequence,
-          s.stop_id,
-          t.trip_id
-        from trips as t
-        inner join stop_times as st on st.trip_id=t.trip_id
-        inner join stops as s on s.stop_id=st.stop_id
-        inner join calendar_dates as cd on cd.service_id=t.service_id
-        where
-          (
-            (date = :today and departure_time > :time) or date = :tomorrow
-          ) and t.trip_id in (
-              select distinct st.trip_id
-              from stop_times as st
-              where st.stop_id = :sid
-            )
-        order by date, departure_time;
-        ",
-        )
-            .unwrap();
+        let now = Utc::now();
+        let amsterdam_now = now.with_timezone(&Amsterdam);
+        let today = amsterdam_now.format("%Y%m%d").to_string();
+        let tomorrow = (amsterdam_now + chrono::Duration::days(1))
+            .format("%Y%m%d")
+            .to_string();
+        let time = amsterdam_now.format("%H:%M").to_string();
 
-        debug!("stmt {:?}", stmt);
-        let results = stmt
-            .query_map_named(
-                &[
-                (":today", &today),
-                (":tomorrow", &tomorrow),
-                (":sid", &sid),
-                (":time", &time),
-                ],
+        debug!("now {}", now);
+        debug!("amsterdam_now {}", amsterdam_now);
+        debug!("today {}", today);
+        debug!("tomorrow {}", tomorrow);
+
+        let results = conn
+            .prepare(queries::DEPARTURES)
+            .unwrap()
+            .query_map(
+                params![ &today, &tomorrow, &sid, &time ],
                 |row| Ok(Row {
                     date: row.get(0).unwrap(),
                     departure_time: row.get(1).unwrap(),
@@ -175,13 +126,13 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
                     end_stop,
                 }
             })
-        .sorted_by_key(|list_item| {
-            (
-                list_item.start_stop.date.to_owned(),
-                list_item.start_stop.time.to_owned(),
-            )
-        })
-        .collect_vec();
+            .sorted_by_key(|list_item| {
+                (
+                    list_item.start_stop.date.to_owned(),
+                    list_item.start_stop.time.to_owned(),
+                )
+            })
+            .collect_vec();
 
         list_items.truncate(64);
 
@@ -196,30 +147,35 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
         let feed_info = get_feed_info(&conn);
 
         MainCtx {
-           page_title: format!("pont.app - {}", &stop_name),
-           page_description: format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
-           content: Content::DeparturesCtx { list_items },
-           title: format!("Vanaf {}", stop_name),
-           feed_info,
-           download_date: fs::read_to_string("/data/download_date").ok(),
-       }
+            page_title: format!("pont.app - {}", &stop_name),
+            page_description: format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
+            content: Content::DeparturesCtx { list_items },
+            title: format!("Vanaf {}", stop_name),
+            feed_info,
+            download_date: fs::read_to_string("/data/download_date").ok(),
+        }
     }).await;
-
 
     Template::render("upcoming-departures", context)
 }
 
 #[get("/public/<file..>")]
-async fn public(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("public/").join(file)).await.ok()
+async fn public(file: PathBuf) -> Option<models::CachedFile> {
+    NamedFile::open(Path::new("public/").join(file))
+        .await
+        .ok()
+        .map(|nf| models::CachedFile(nf))
 }
 
 // NOTE Service_worker needs to be hosted from root
 // NOTE Not hard coding the path, otherwise recompile is needed when changing sw file name
 //      This does mean that everything in ./public/scripts is hosted at `/`, but we don't care.
 #[get("/<sw>")]
-async fn service_worker(sw: &str) -> Option<NamedFile> {
-    NamedFile::open(Path::new("public").join("scripts").join(sw)).await.ok()
+async fn service_worker(sw: &str) -> Option<models::CachedFile> {
+    NamedFile::open(Path::new("public").join("scripts").join(sw))
+        .await
+        .ok()
+        .map(|nf| models::CachedFile(nf))
 }
 
 #[launch]

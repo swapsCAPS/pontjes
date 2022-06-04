@@ -1,5 +1,7 @@
-use crate::gtfs_to_sane_date;
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::fs::NamedFile;
+use rocket::serde::Serialize;
+
+use crate::utils;
 
 #[derive(Serialize, Debug)]
 pub struct Stop {
@@ -28,7 +30,7 @@ pub struct ListItemStop {
 // TODO implement std::cmp::Ordering
 impl ListItemStop {
     pub fn new(date: &str, time: &str, stop_name: &str) -> ListItemStop {
-        let (date, time) = gtfs_to_sane_date(&date, &time);
+        let (date, time) = utils::gtfs_to_sane_date(&date, &time);
         ListItemStop {
             date: date.to_owned(),
             time: time.to_owned(),
@@ -38,7 +40,7 @@ impl ListItemStop {
     }
 
     pub fn from(row: &Row) -> ListItemStop {
-        let (date, time) = gtfs_to_sane_date(&row.date, &row.departure_time);
+        let (date, time) = utils::gtfs_to_sane_date(&row.date, &row.departure_time);
         ListItemStop {
             date: date.to_owned(),
             time: time.to_owned(),
@@ -81,4 +83,14 @@ pub struct FeedInfo {
     pub feed_start_date: String,
     pub feed_end_date: String,
     pub feed_version: String,
+}
+
+pub struct CachedFile(pub NamedFile);
+
+impl<'r> rocket::response::Responder<'r, 'r> for CachedFile {
+    fn respond_to(self, req: &rocket::Request) -> rocket::response::Result<'r> {
+        rocket::Response::build_from(self.0.respond_to(req)?)
+            .raw_header("Cache-control", "max-age=86400")
+            .ok()
+    }
 }
