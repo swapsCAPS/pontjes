@@ -10,7 +10,7 @@ serde = { version = "1.0", features = ["derive"] }
 chrono = "0.4"
 chrono-tz = "0.5"
 itertools = "0.9.0"
-# libsqlite3-sys = { version = "0.9.1", features = [ "bundled" ] }
+libsqlite3-sys = { version = "0.22.2", features = [ "bundled" ] }
 log = "0.4"
 pretty_env_logger = "0.4"
 lazy_static = "1.4.0"
