@@ -1,8 +1,15 @@
-#[macro_use]
-extern crate rocket_contrib;
 extern crate pretty_env_logger;
 use chrono::{Duration, NaiveDate};
-use rocket_contrib::databases::rusqlite;
+use rocket::response::Debug;
+
+use rocket_sync_db_pools::{database, rusqlite};
+
+use rusqlite::params;
+
+#[database("rusqlite")]
+struct Db(rusqlite::Connection);
+
+type Result<T, E = Debug<rusqlite::Error>> = std::result::Result<T, E>;
 
 pub mod models;
 
@@ -17,18 +24,14 @@ pub fn get_requested_stop(datum: &Vec<models::Row>, sid: &str) -> String {
     }
 }
 
-pub fn get_feed_info(conn: &PontjesDb) -> models::FeedInfo {
+pub fn get_feed_info(conn: &rusqlite::Connection) -> models::FeedInfo {
     conn.prepare("select * from feed_info limit 1;")
         .unwrap()
-        .query_map(&[], |row| models::FeedInfo {
-            feed_start_date: row.get(4),
-            feed_end_date: row.get(5),
-            feed_version: row.get(6),
-        })
-        .unwrap()
-        .nth(0)
-        .expect("Did not get feed info!")
-        .unwrap()
+        .query_map(params![], |row| Ok(models::FeedInfo {
+            feed_start_date: row.get(4).unwrap(),
+            feed_end_date: row.get(5).unwrap(),
+            feed_version: row.get(6).unwrap(),
+        })).unwrap().nth(0).unwrap().unwrap()
 }
 
 // TODO move this to method on ListItem or smth

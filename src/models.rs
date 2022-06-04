@@ -1,5 +1,5 @@
 use crate::gtfs_to_sane_date;
-use serde::Serialize;
+use rocket::serde::{json::Json, Deserialize, Serialize};
 
 #[derive(Serialize, Debug)]
 pub struct Stop {
@@ -62,9 +62,9 @@ pub enum Content {
 }
 
 #[derive(Serialize)]
-pub struct MainCtx<'a> {
-    pub page_title: &'a str,
-    pub page_description: &'a str,
+pub struct MainCtx {
+    pub page_title: String,
+    pub page_description: String,
     pub feed_info: FeedInfo,
     pub title: String,
     pub download_date: Option<String>,
