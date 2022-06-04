@@ -78,7 +78,12 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
             .prepare(queries::DEPARTURES)
             .unwrap()
             .query_map(
-                params![ &today, &tomorrow, &sid, &time ],
+                &[
+                (":today", &today),
+                (":tomorrow", &tomorrow),
+                (":sid", &sid),
+                (":time", &time),
+                ],
                 |row| Ok(Row {
                     date: row.get(0).unwrap(),
                     departure_time: row.get(1).unwrap(),
