@@ -1,12 +1,18 @@
-const OFFLINE_VERSION = 1;
-const CACHE_NAME = 'offline';
+const OFFLINE_VERSION = 2;
+const CACHE_NAME = `offline-${OFFLINE_VERSION}`;
 
 const offlinePage = new Request('/public/offline.html', { cache: 'reload' })
 const reqsToCache = [
-  new Request('/public/stylesheets/main.css', { cache: 'reload' }),
+  new Request('/public/stylesheets/main-v9.css', { cache: 'reload' }),
   new Request('/public/fonts/Roboto-Bold.ttf', { cache: 'reload' }),
   new Request('/public/fonts/Roboto-Regular.ttf', { cache: 'reload' }),
   new Request('/public/favicon.png', { cache: 'reload' }),
+  new Request('/public/favicon-192.png', { cache: 'reload' }),
+  new Request('/public/favicon-512.png', { cache: 'reload' }),
+  new Request('/public/favicon-128.png', { cache: 'reload' }),
+  new Request('/public/favicon-152.png', { cache: 'reload' }),
+  new Request('/public/favicon-180.png', { cache: 'reload' }),
+  new Request('/public/favicon-167.png', { cache: 'reload' }),
 ];
 
 self.addEventListener('install', (event) => {
