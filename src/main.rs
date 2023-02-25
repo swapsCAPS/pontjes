@@ -109,6 +109,11 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Result<Template, R
             .values()
             // TODO The length filter is prolly too naive
             .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
+            // We might get trips that do not contain our stop. Not sure why, but sometimes we
+            // panic.
+            // TODO write test!
+            // TODO monitor logs to check if this .filter() helped!
+            .filter(|row| row.iter().find(|x| x.stop_id == sid).is_some())
             .map(|trip| {
                 let active_stop: &Row = trip.iter().find(|x| x.stop_id == sid).unwrap();
                 let last: &Row = &trip[trip.len() - 1];
@@ -164,7 +169,7 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Result<Template, R
                 download_date: fs::read_to_string("/data/download_date").ok(),
             })
         } else {
-            warn!("upcoming_departures - No stop found for {}", &sid);
+            warn!("/upcoming_departures - No stop found for [{}]", &sid);
             return None
         };
 
