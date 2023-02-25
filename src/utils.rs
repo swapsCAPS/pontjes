@@ -1,6 +1,6 @@
 use chrono::{Duration, NaiveDate};
 use rocket_sync_db_pools::{database, rusqlite};
-use rusqlite::params;
+use std::{error::Error, fmt::Display};
 
 use crate::models;
 
@@ -18,20 +18,17 @@ pub fn get_requested_stop(datum: &Vec<models::Row>, sid: &str) -> String {
     }
 }
 
-pub fn get_feed_info(conn: &rusqlite::Connection) -> models::FeedInfo {
-    conn.prepare("select * from feed_info limit 1;")
-        .unwrap()
-        .query_map(params![], |row| {
+pub fn get_feed_info(conn: &rusqlite::Connection) -> Result<models::FeedInfo, rusqlite::Error> {
+    conn.prepare("select * from feed_info limit 1;")?
+        .query_map(rusqlite::params![], |row| {
             Ok(models::FeedInfo {
-                feed_start_date: row.get(4).unwrap(),
-                feed_end_date: row.get(5).unwrap(),
-                feed_version: row.get(6).unwrap(),
+                feed_start_date: row.get(4)?,
+                feed_end_date: row.get(5)?,
+                feed_version: row.get(6)?,
             })
-        })
-        .unwrap()
+        })?
         .nth(0)
-        .unwrap()
-        .unwrap()
+        .expect("Expected at least 1 feed_info")
 }
 
 // TODO move this to method on ListItem or smth

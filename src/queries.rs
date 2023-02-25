@@ -27,5 +27,5 @@ pub const DEPARTURES: &str = "
             from stop_times as st
             where st.stop_id = :sid
         )
-    order by date, departure_time;
+    order by date, departure_time, stop_name;
 ";
