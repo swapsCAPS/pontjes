@@ -32,7 +32,7 @@ Editing these without a re-build is therefore possible, but does require a `make
 Also, be careful ; )
 
 ## TODO
-- [ ] Stop using debian image, unnecessary
+- [ ] Boxed errors? E.g. for `get_feed_info()` return type
 - [x] Compare joins vs pre imported data performance
 - [x] Use joins in combination with indexes
 - [x] Add manifest
@@ -42,7 +42,6 @@ Also, be careful ; )
 - [x] Fix build
 - [x] Add favicon!
 - [x] Put feed info in static
-- [ ] Fix nightly version in place
 - [x] Fix cross compilation
 - [x] Update to rocket 5
 - [x] Add date of gtfs file
