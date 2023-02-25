@@ -10,8 +10,9 @@ use chrono::Utc;
 use chrono_tz::Europe::Amsterdam;
 use itertools::Itertools;
 use rocket::fs::NamedFile;
+use rocket::response::Redirect;
 use rocket_dyn_templates::Template;
-use rocket_sync_db_pools::rusqlite::params;
+use rocket_sync_db_pools::rusqlite::{params, OptionalExtension};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -58,9 +59,9 @@ async fn index(db: PontjesDb) -> Template {
 }
 
 #[get("/upcoming-departures/<raw_sid>")]
-async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
+async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Result<Template, Redirect> {
     let sid = raw_sid.to_string();
-    let context = db.run(move |conn| {
+    let context: Option<MainCtx> = db.run(move |conn| {
         let now = Utc::now();
         let amsterdam_now = now.with_timezone(&Amsterdam);
         let today = amsterdam_now.format("%Y%m%d").to_string();
@@ -141,27 +142,39 @@ async fn upcoming_departures(db: PontjesDb, raw_sid: &str) -> Template {
 
         list_items.truncate(64);
 
-        let stop_name: String = conn
+        // Blegh, ugly code. TODO improve Error/Option handling
+        let stop_name: Option<String> = conn
             .query_row(
                 "select stop_name from stops where stop_id = ?;",
                 &[&sid],
                 |row| row.get(0),
             )
+            .optional()
             .unwrap();
 
-        let feed_info = get_feed_info(&conn);
+        if let Some(stop_name) = stop_name {
+            let feed_info = get_feed_info(&conn);
 
-        MainCtx {
-            page_title: format!("pont.app - {}", &stop_name),
-            page_description: format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
-            content: Content::DeparturesCtx { list_items },
-            title: format!("Vanaf {}", stop_name),
-            feed_info,
-            download_date: fs::read_to_string("/data/download_date").ok(),
-        }
+            return Some(MainCtx {
+                page_title: format!("pont.app - {}", &stop_name),
+                page_description: format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
+                content: Content::DeparturesCtx { list_items },
+                title: format!("Vanaf {}", stop_name),
+                feed_info,
+                download_date: fs::read_to_string("/data/download_date").ok(),
+            })
+        } else {
+            warn!("upcoming_departures - No stop found for {}", &sid);
+            return None
+        };
+
     }).await;
 
-    Template::render("upcoming-departures", context)
+    if let Some(context) = context {
+        Ok(Template::render("upcoming-departures", context))
+    } else {
+        Err(Redirect::to("/"))
+    }
 }
 
 #[get("/public/<file..>")]
