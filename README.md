@@ -32,6 +32,7 @@ Editing these without a re-build is therefore possible, but does require a `make
 Also, be careful ; )
 
 ## TODO
+- [ ] Stop using debian image, unnecessary
 - [x] Compare joins vs pre imported data performance
 - [x] Use joins in combination with indexes
 - [x] Add manifest
