@@ -1,6 +1,5 @@
 use chrono::{Duration, NaiveDate};
 use rocket_sync_db_pools::{database, rusqlite};
-use std::{error::Error, fmt::Display};
 
 use crate::models;
 
@@ -28,7 +27,11 @@ pub fn get_feed_info(conn: &rusqlite::Connection) -> Result<models::FeedInfo, ru
             })
         })?
         .nth(0)
-        .expect("Expected at least 1 feed_info")
+        .unwrap_or_else(|| {
+            warn!("Should not happen! No feed_info found!");
+            // TODO Box or wrap our errors... Dont return lib errors as our own...
+            Err(rusqlite::Error::QueryReturnedNoRows)
+        })
 }
 
 // TODO move this to method on ListItem or smth

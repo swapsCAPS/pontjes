@@ -8,7 +8,7 @@ extern crate lazy_static;
 
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
-use rocket_dyn_templates::{context, Template};
+use rocket_dyn_templates::Template;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -28,8 +28,18 @@ async fn index(db: PontjesDb) -> Template {
     match controllers::index(db).await {
         Ok(context) => Template::render("index", context),
         Err(e) => {
-            error!("/index encountered unexpected error: {}", e);
-            Template::render("error", context! {})
+            error!("/index Encountered unexpected error: {}", e);
+            Template::render(
+                "error",
+                models::MainCtx {
+                    title: String::from("Oeps... Stuk"),
+                    page_title: String::from("pont.app"),
+                    page_description: String::from(""),
+                    feed_info: None,
+                    download_date: None,
+                    content: None,
+                },
+            )
         }
     }
 }

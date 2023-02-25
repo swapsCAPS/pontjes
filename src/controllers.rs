@@ -26,9 +26,9 @@ pub async fn index(db: PontjesDb) -> Result<MainCtx, rusqlite::Error> {
             page_title: String::from("pont.app"),
             page_description: String::from("Je appie voor de Amsterdamse pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date."),
             title: String::from("Vanaf"),
-            feed_info,
+            feed_info: Some(feed_info),
             download_date: fs::read_to_string("/data/download_date").ok(),
-            content: Content::IndexCtx { stops },
+            content: Some(Content::IndexCtx { stops }),
         })
     }).await
 }
@@ -123,7 +123,7 @@ pub async fn upcoming_departures(db: PontjesDb, sid: String) -> Result<MainCtx, 
             .query_row(
                 "select stop_name from stops where stop_id = ?;",
                 &[&sid],
-            |row| row.get(0),
+                |row| row.get(0)
             )?;
 
         let feed_info = get_feed_info(&conn)?;
@@ -131,9 +131,9 @@ pub async fn upcoming_departures(db: PontjesDb, sid: String) -> Result<MainCtx, 
         Ok(MainCtx {
             page_title: format!("pont.app - {}", &stop_name),
             page_description: format!("{} pont tijden. Elke dag een vers geïmporteerde GVB dienstregeling, dus zo snel mogelijk up to date.", &stop_name),
-            content: Content::DeparturesCtx { list_items },
+            content: Some(Content::DeparturesCtx { list_items }),
             title: format!("Vanaf {}", stop_name),
-            feed_info,
+            feed_info: Some(feed_info),
             download_date: fs::read_to_string("/data/download_date").ok(),
         })
     }).await

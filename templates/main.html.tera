@@ -29,6 +29,7 @@
         </a>
       </div>
       {% block content %}{% endblock content %}
+      {% if feed_info %}
       <div class="footer">
         <a href="https://daans.page">built by daan</a><br>
         <a href="https://rocket.rs">powered by rocket</a><br>
@@ -37,6 +38,7 @@
         <a href="http://gtfs.ovapi.nl">imported on {{ download_date }}</a><br>
         <span>valid from {{ feed_info.feed_start_date }}</span><br>
         <span>valid to {{ feed_info.feed_end_date }}</span>
+      {% endif %}
       </div>
     </div>
   </body>

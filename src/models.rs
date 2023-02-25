@@ -67,10 +67,10 @@ pub enum Content {
 pub struct MainCtx {
     pub page_title: String,
     pub page_description: String,
-    pub feed_info: FeedInfo,
+    pub feed_info: Option<FeedInfo>,
     pub title: String,
     pub download_date: Option<String>,
-    pub content: Content,
+    pub content: Option<Content>,
 }
 
 #[derive(Serialize)]
