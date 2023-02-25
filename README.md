@@ -9,7 +9,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Install deps if necessary
 ```
 sudo apt install gcc make sqlite3 unzip
-cargo install cross
+cargo install cross --git https://github.com/cross-rs/cross
 ```
 
 Rocket needs nightly
@@ -43,13 +43,13 @@ Also, be careful ; )
 - [x] Put feed info in static
 - [ ] Fix nightly version in place
 - [x] Fix cross compilation
-- [ ] Update to rocket 5
+- [x] Update to rocket 5
 - [x] Add date of gtfs file
 - [ ] Optimize grouping by doing group_concat on date and trip_id in sql query
-- [ ] Add more clear back button
+- [x] Add more clear back button
 - [ ] Use diesel table aliasing once it lands... sql query can be done in one go, however diesel does not support it.
 - [ ] Change "via" to "van" if "other" stop time is before selected stop time
-- [ ] Set up ARM cross compilation docker build
+- [x] Set up ARM cross compilation docker build
 - [ ] Add some usage metrics
 - [ ] Minify css
 - [ ] Add ad. Boooo!
