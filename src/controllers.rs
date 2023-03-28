@@ -1,5 +1,6 @@
-use chrono::Utc;
+use chrono::DateTime;
 use chrono_tz::Europe::Amsterdam;
+use chrono_tz::Tz;
 use itertools::Itertools;
 use rocket_sync_db_pools::rusqlite;
 use std::fs;
@@ -33,18 +34,15 @@ pub async fn index(db: PontjesDb) -> Result<MainCtx, rusqlite::Error> {
     }).await
 }
 
-pub async fn upcoming_departures(db: PontjesDb, sid: String) -> Result<MainCtx, rusqlite::Error> {
+pub async fn upcoming_departures(db: PontjesDb, sid: String, amsterdam_time: DateTime<Tz>) -> Result<MainCtx, rusqlite::Error> {
     db.run(move |conn| {
-        let now = Utc::now();
-        let amsterdam_now = now.with_timezone(&Amsterdam);
-        let today = amsterdam_now.format("%Y%m%d").to_string();
-        let tomorrow = (amsterdam_now + chrono::Duration::days(1))
+        let today = amsterdam_time.format("%Y%m%d").to_string();
+        let tomorrow = (amsterdam_time + chrono::Duration::days(1))
             .format("%Y%m%d")
             .to_string();
-        let time = amsterdam_now.format("%H:%M").to_string();
+        let time = amsterdam_time.format("%H:%M").to_string();
 
-        debug!("now {}", now);
-        debug!("amsterdam_now {}", amsterdam_now);
+        debug!("amsterdam_time {}", amsterdam_time);
         debug!("today {}", today);
         debug!("tomorrow {}", tomorrow);
 

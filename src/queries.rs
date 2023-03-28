@@ -21,7 +21,7 @@ pub const DEPARTURES: &str = "
     inner join calendar_dates as cd on cd.service_id=t.service_id
     where
         (
-            (date = :today and departure_time > :time) or date = :tomorrow
+            (date = :today and departure_time >= :time) or date = :tomorrow
         ) and t.trip_id in (
             select distinct st.trip_id
             from stop_times as st
