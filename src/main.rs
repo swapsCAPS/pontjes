@@ -46,28 +46,11 @@ async fn index(db: PontjesDb) -> Template {
     }
 }
 
-// TODO WIP
 #[get("/upcoming-departures/<raw_sid>?<dt>")]
 async fn upcoming_departures(db: PontjesDb, raw_sid: &str, dt: Option<&str>) -> Result<Template, Redirect> {
-    // If we can't parse correctly we want to log an error and return a NaiveDateTime for the
-    // current datetime
-    let naive_date = match dt {
-        Some(date_time_str) => {
-            NaiveDateTime::parse_from_str(date_time_str, "%Y-%m-%dT%H:%M").unwrap_or_else(|_| {
-                warn!("Could not parse string {} to NaiveDateTimei, going for default of Utc::now()", date_time_str);
-                NaiveDateTime::from_timestamp_opt(Utc::now().timestamp_millis() / 1000, 0).expect("What?! This really should not happen")
-            })
-        },
-        None => {
-            NaiveDateTime::from_timestamp_opt(Utc::now().timestamp_millis() / 1000, 0).expect("What?! This really should not happen")
-        }
-    };
+    let naive_datetime = utils::parse_date_time(dt);
 
-    let amsterdam_date_time = Amsterdam.from_local_datetime(&naive_date).unwrap();
-
-    debug!("amsterdam_date_time {}", amsterdam_date_time);
-
-    match controllers::upcoming_departures(db, raw_sid.to_string(), amsterdam_date_time).await {
+    match controllers::upcoming_departures(db, raw_sid.to_string(), naive_datetime).await {
         Ok(context) => Ok(Template::render("upcoming-departures", context)),
         Err(e) => {
             warn!(
