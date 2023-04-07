@@ -27,6 +27,24 @@ Blast off
 cargo run
 ```
 
+## Deployment
+
+### Build for Pi
+```
+make build-pi
+git add bin/pontjes_aarch64-unknown-linux-gnu
+gc -m 'built pi'
+```
+
+### Deploy
+```
+ssh <to@server>
+cd src/pontjes
+git pull
+make build-docker run
+```
+
+
 The docker container mounts the static files and the templates.  
 Editing these without a re-build is therefore possible, but does require a `make docker-restart` afterwards.  
 Also, be careful ; )
