@@ -1,6 +1,4 @@
-use chrono::{DateTime, NaiveDateTime};
-use chrono_tz::Europe::Amsterdam;
-use chrono_tz::Tz;
+use chrono::NaiveDateTime;
 use itertools::Itertools;
 use rocket_sync_db_pools::rusqlite;
 use std::fs;
@@ -34,7 +32,11 @@ pub async fn index(db: PontjesDb) -> Result<MainCtx, rusqlite::Error> {
     }).await
 }
 
-pub async fn upcoming_departures(db: PontjesDb, sid: String, naive_datetime: NaiveDateTime) -> Result<MainCtx, rusqlite::Error> {
+pub async fn upcoming_departures(
+    db: PontjesDb,
+    sid: String,
+    naive_datetime: NaiveDateTime,
+) -> Result<MainCtx, rusqlite::Error> {
     db.run(move |conn| {
         let today = naive_datetime.format("%Y%m%d").to_string();
         let tomorrow = (naive_datetime + chrono::Duration::days(1))

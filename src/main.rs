@@ -6,8 +6,6 @@ extern crate log;
 #[macro_use]
 extern crate lazy_static;
 
-use chrono_tz::Europe::Amsterdam;
-use chrono::{Utc, DateTime, NaiveDate, NaiveDateTime, TimeZone};
 use rocket::fs::NamedFile;
 use rocket::response::Redirect;
 use rocket_dyn_templates::Template;
@@ -47,7 +45,11 @@ async fn index(db: PontjesDb) -> Template {
 }
 
 #[get("/upcoming-departures/<raw_sid>?<dt>")]
-async fn upcoming_departures(db: PontjesDb, raw_sid: &str, dt: Option<&str>) -> Result<Template, Redirect> {
+async fn upcoming_departures(
+    db: PontjesDb,
+    raw_sid: &str,
+    dt: Option<&str>,
+) -> Result<Template, Redirect> {
     let naive_datetime = utils::parse_date_time(dt);
 
     match controllers::upcoming_departures(db, raw_sid.to_string(), naive_datetime).await {

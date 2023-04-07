@@ -1,5 +1,5 @@
-use chrono::{Utc, Duration, NaiveDate, NaiveDateTime};
-use chrono_tz::{Tz, Europe::Amsterdam};
+use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
+use chrono_tz::Europe::Amsterdam;
 use rocket_sync_db_pools::{database, rusqlite};
 
 use crate::models;
@@ -27,7 +27,7 @@ pub fn get_feed_info(conn: &rusqlite::Connection) -> Result<models::FeedInfo, ru
                 feed_version: row.get(6)?,
             })
         })?
-    .nth(0)
+        .nth(0)
         .unwrap_or_else(|| {
             warn!("Should not happen! No feed_info found!");
             // TODO Box or wrap our errors... Dont return lib errors as our own...
@@ -66,14 +66,9 @@ pub fn gtfs_to_sane_date(date: &str, time: &str) -> (String, String) {
  */
 pub fn parse_date_time(dt: Option<&str>) -> NaiveDateTime {
     match dt {
-        Some(dt) => {
-            NaiveDateTime::parse_from_str(dt, "%Y-%m-%dT%H:%M").unwrap_or_else(|_| {
-                Utc::now().with_timezone(&Amsterdam).naive_local()
-            })
-        },
-        None => {
-            Utc::now().with_timezone(&Amsterdam).naive_local()
-        }
+        Some(dt) => NaiveDateTime::parse_from_str(dt, "%Y-%m-%dT%H:%M")
+            .unwrap_or_else(|_| Utc::now().with_timezone(&Amsterdam).naive_local()),
+        None => Utc::now().with_timezone(&Amsterdam).naive_local(),
     }
 }
 
