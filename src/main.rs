@@ -76,7 +76,7 @@ async fn public(file: PathBuf) -> Option<models::CachedFile> {
 // NOTE Not hard coding the path, otherwise recompile is needed when changing sw file name
 //      This does mean that everything in ./public/scripts is hosted at `/`, but we don't care.
 #[get("/<sw>")]
-async fn service_worker(sw: &str) -> Option<models::CachedFile> {
+async fn service_worker(sw: PathBuf) -> Option<models::CachedFile> {
     NamedFile::open(Path::new("public").join("scripts").join(sw))
         .await
         .ok()
