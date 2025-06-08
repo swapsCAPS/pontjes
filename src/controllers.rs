@@ -13,8 +13,7 @@ pub async fn index(db: PontjesDb) -> Result<MainCtx, rusqlite::Error> {
 
         let stops = stmt
             .query_map(rusqlite::params![], |row| Ok(Stop {
-                stop_id: row.get(0)?,
-                stop_name: row.get(1)?,
+                stop_name: row.get(0)?,
             }))?
             .map(|x| x.unwrap())
             .collect_vec();
@@ -34,7 +33,7 @@ pub async fn index(db: PontjesDb) -> Result<MainCtx, rusqlite::Error> {
 
 pub async fn upcoming_departures(
     db: PontjesDb,
-    sid: String,
+    stop_name: String,
     naive_datetime: NaiveDateTime,
 ) -> Result<MainCtx, rusqlite::Error> {
     db.run(move |conn| {
@@ -54,7 +53,7 @@ pub async fn upcoming_departures(
                 &[
                 (":today", &today),
                 (":tomorrow", &tomorrow),
-                (":sid", &sid),
+                (":stop_name", &stop_name),
                 (":time", &time),
                 ],
                 |row| Ok(Row {
@@ -69,6 +68,8 @@ pub async fn upcoming_departures(
             .map(|x| x.unwrap())
             .collect_vec();
 
+        println!("results:\n{:?}", results);
+
         let tuples: Vec<(String, Row)> = results
             .into_iter()
             .map(|r| (format!("{}{}", r.date, r.trip_id), r))
@@ -76,17 +77,20 @@ pub async fn upcoming_departures(
 
         let group_map = tuples.into_iter().into_group_map();
 
+        println!("group_map:\n{:?}", group_map);
+
         let mut list_items: Vec<ListItem> = group_map
             .values()
             // TODO The length filter is prolly too naive
-            .filter(|row| row.len() > 1 && row[row.len() - 1].stop_id != sid)
+            .filter(|row| row.len() > 1 && row[row.len() - 1].stop_name != stop_name)
             // We might get trips that do not contain our stop. Not sure why, but sometimes we
             // panic.
             // TODO write test!
             // TODO monitor logs to check if this .filter() helped!
-            .filter(|row| row.iter().find(|x| x.stop_id == sid).is_some())
+            .filter(|row| row.iter().find(|x| x.stop_name == stop_name).is_some())
             .map(|trip| {
-                let active_stop: &Row = trip.iter().find(|x| x.stop_id == sid).unwrap();
+                println!("trip: {:?}", trip);
+                let active_stop: &Row = trip.iter().find(|x| x.stop_name == stop_name).unwrap();
                 let last: &Row = &trip[trip.len() - 1];
 
                 let start_stop = ListItemStop::from(&active_stop);
@@ -121,8 +125,8 @@ pub async fn upcoming_departures(
 
         let stop_name: String = conn
             .query_row(
-                "select stop_name from stops where stop_id = ?;",
-                &[&sid],
+                "select stop_name from stops where stop_name = ?;",
+                &[&stop_name],
                 |row| row.get(0)
             )?;
 

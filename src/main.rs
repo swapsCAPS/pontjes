@@ -44,20 +44,20 @@ async fn index(db: PontjesDb) -> Template {
     }
 }
 
-#[get("/upcoming-departures/<raw_sid>?<dt>")]
+#[get("/upcoming-departures/<raw_stop_name>?<dt>")]
 async fn upcoming_departures(
     db: PontjesDb,
-    raw_sid: &str,
+    raw_stop_name: &str,
     dt: Option<&str>,
 ) -> Result<Template, Redirect> {
     let naive_datetime = utils::parse_date_time(dt);
 
-    match controllers::upcoming_departures(db, raw_sid.to_string(), naive_datetime).await {
+    match controllers::upcoming_departures(db, raw_stop_name.to_string(), naive_datetime).await {
         Ok(context) => Ok(Template::render("upcoming-departures", context)),
         Err(e) => {
             warn!(
                 "/upcoming-departures/{} encountered unexpected error: {}",
-                raw_sid, e
+                raw_stop_name, e
             );
             Err(Redirect::to("/"))
         }

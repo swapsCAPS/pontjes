@@ -5,7 +5,6 @@ use crate::utils;
 
 #[derive(Serialize, Debug)]
 pub struct Stop {
-    pub stop_id: String,
     pub stop_name: String,
 }
 

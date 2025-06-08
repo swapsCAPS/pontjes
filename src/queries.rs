@@ -1,5 +1,5 @@
 pub const INDEX: &str = "
-    select distinct s.stop_id, stop_name from routes as r
+    select distinct stop_name from routes as r
     inner join trips as t on t.route_id = r.route_id
     inner join stop_times as st on st.trip_id = t.trip_id
     inner join stops as s on s.stop_id = st.stop_id
@@ -25,7 +25,8 @@ pub const DEPARTURES: &str = "
         ) and t.trip_id in (
             select distinct st.trip_id
             from stop_times as st
-            where st.stop_id = :sid
+            inner join stops as _s on _s.stop_id=st.stop_id
+            where _s.stop_name = :stop_name
         )
     order by date, departure_time, stop_name;
 ";
