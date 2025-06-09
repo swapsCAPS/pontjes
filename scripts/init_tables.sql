@@ -23,8 +23,8 @@ update stops set stop_name = replace(stop_name, 'Spaarndam, ', '');
 update stops set stop_name = replace(stop_name, 'Assendelft, ', '');
 update stops set stop_name = replace(stop_name, 'Zaandam, ', '');
 
---- Fucking idiots...
-update stops set stop_name = replace(stop_name, 'NDSM-werf, ', 'NDSM');
+--- Fucking idiots... Pick a name and stick with it
+update stops set stop_name = replace(stop_name, 'NDSM-werf', 'NDSM');
 
 --- Remove seconds from departure_time
 update stop_times set departure_time = substr(departure_time, 1, 5);

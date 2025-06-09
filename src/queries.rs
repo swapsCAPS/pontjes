@@ -7,6 +7,12 @@ pub const INDEX: &str = "
     order by stop_name;
 ";
 
+// Note this was initially done using stop_id to query, but there have been GTFS datasets where the
+// same stop had multiple stop_ids. I.e. there were multiple instances of the same stop in the
+// dataset. Even worse, you would get a stop called NDSM and a stop called NDSM-werf...
+// To work around this I decided to go with stop_name as query input instead. (And add some custom
+// sanitization during GTFS import...)
+// As you can maybe deduce from my tone, I'm not happy with this.
 pub const DEPARTURES: &str = "
     select
         date,
