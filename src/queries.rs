@@ -20,8 +20,10 @@ pub const DEPARTURES: &str = "
         stop_name,
         stop_sequence,
         s.stop_id,
-        t.trip_id
+        t.trip_id,
+        r.route_short_name
     from trips as t
+    inner join routes as r on t.route_id=r.route_id
     inner join stop_times as st on st.trip_id=t.trip_id
     inner join stops as s on s.stop_id=st.stop_id
     inner join calendar_dates as cd on cd.service_id=t.service_id

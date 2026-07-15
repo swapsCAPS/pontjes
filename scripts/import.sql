@@ -1,3 +1,8 @@
+PRAGMA journal_mode = OFF;
+PRAGMA synchronous = OFF;
+PRAGMA cache_size = -200000; -- Uses ~200MB RAM for cache
+PRAGMA temp_store = MEMORY;
+
 .mode csv
 delete from stops;
 delete from calendar_dates;
@@ -28,3 +33,9 @@ create unique index if not exists routes_route_id on routes (route_id);
 create index if not exists routes_agency_id on routes (agency_id);
 create index if not exists routes_agency_id_route_url on routes (agency_id, route_url);
 create index if not exists routes_route_url on routes (route_url);
+
+create index if not exists idx_stop_times_trip_stop on stop_times (trip_id, stop_id);
+create index if not exists idx_stops_name on stops (stop_name, stop_id);
+create index if not exists idx_calendar_dates_date on calendar_dates (date, service_id);
+
+analyze;

@@ -16,6 +16,7 @@ pub struct Row {
     pub stop_id: String,
     pub trip_id: String,
     pub stop_sequence: String,
+    pub route_short_name: String,
 }
 
 #[derive(Serialize)]
@@ -24,17 +25,19 @@ pub struct ListItemStop {
     pub time: String,
     pub date_time: String,
     pub stop_name: String,
+    pub route_short_name: String,
 }
 
 // TODO implement std::cmp::Ordering
 impl ListItemStop {
-    pub fn new(date: &str, time: &str, stop_name: &str) -> ListItemStop {
+    pub fn new(date: &str, time: &str, stop_name: &str, route_short_name: &str) -> ListItemStop {
         let (date, time) = utils::gtfs_to_sane_date(&date, &time);
         ListItemStop {
             date: date.to_owned(),
             time: time.to_owned(),
             date_time: format!("{}{}", &date, &time),
             stop_name: stop_name.to_owned(),
+            route_short_name: route_short_name.to_owned(),
         }
     }
 
@@ -45,6 +48,7 @@ impl ListItemStop {
             time: time.to_owned(),
             date_time: format!("{}{}", &date, &time),
             stop_name: row.stop_name.to_owned(),
+            route_short_name: row.route_short_name.to_owned(),
         }
     }
 }

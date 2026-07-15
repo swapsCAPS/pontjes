@@ -63,12 +63,13 @@ pub async fn upcoming_departures(
                     stop_sequence: row.get(3)?,
                     stop_id: row.get(4)?,
                     trip_id: row.get(5)?,
+                    route_short_name: row.get(6)?,
                 }),
             )?
             .map(|x| x.unwrap())
             .collect_vec();
 
-        println!("results:\n{:?}", results);
+        // println!("results:\n{:?}", results);
 
         let tuples: Vec<(String, Row)> = results
             .into_iter()
@@ -77,7 +78,7 @@ pub async fn upcoming_departures(
 
         let group_map = tuples.into_iter().into_group_map();
 
-        println!("group_map:\n{:?}", group_map);
+        // println!("group_map:\n{:?}", group_map);
 
         let mut list_items: Vec<ListItem> = group_map
             .values()
@@ -89,7 +90,7 @@ pub async fn upcoming_departures(
             // TODO monitor logs to check if this .filter() helped!
             .filter(|row| row.iter().find(|x| x.stop_name == stop_name).is_some())
             .map(|trip| {
-                println!("trip: {:?}", trip);
+                // println!("trip: {:?}", trip);
                 let active_stop: &Row = trip.iter().find(|x| x.stop_name == stop_name).unwrap();
                 let last: &Row = &trip[trip.len() - 1];
 
